@@ -190,7 +190,7 @@ export interface Fliter {
 
 export interface TableData {
     [prop: string]: any
-    showText?:string
+    showText?: string
     show?: boolean
     title?: string
     path?: string
@@ -211,22 +211,25 @@ export interface TableData {
         [prop: string]: any,
         apiTest: (data: any) => any
     }
-    pageFliter?: {
-        key: string
-        value: number
-    }
-    sizeFliter?: {
-        key: string
-        value: number
-    }
-    sortFliter?: {
-        tableDefault: {
-            prop: string
-            order: string
-        }
-        key: string
-        value: string
-    }
+    // pageFliter?: {
+    //     key: string
+    //     value: number
+    // }
+    // sizeFliter?: {
+    //     key: string
+    //     value: number
+    // }
+    // sortFliter?: {
+    //     tableDefault: {
+    //         prop: string
+    //         order: string
+    //     }
+    //     key: string
+    //     value: string
+    // }
+    pageFliter?: any
+    sizeFliter?: any
+    sortFliter?: any
     total?: number | string
     sizeOption?: Array<number>
     fliter?: Array<Fliter>
