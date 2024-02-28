@@ -15,4 +15,4 @@ yarn dev
 ```sh
 yarn build
 ```
-
+git add .
