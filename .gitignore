@@ -14,7 +14,7 @@ dist
 dist-ssr
 coverage
 *.local
-
+push.bat
 /cypress/videos/
 /cypress/screenshots/
 
