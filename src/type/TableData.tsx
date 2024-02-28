@@ -230,7 +230,7 @@ export interface TableData {
     pageFliter?: any
     sizeFliter?: any
     sortFliter?: any
-    total?: number | string
+    total?: any
     sizeOption?: Array<number>
     fliter?: Array<Fliter>
     beforeFetch?: ((self: TableData, fliter: { [prop: string]: any }) => void) | Array<string>
