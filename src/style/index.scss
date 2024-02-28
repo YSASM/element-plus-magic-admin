@@ -1,0 +1,156 @@
+body {
+    padding: 0;
+    margin: 0;
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+}
+
+#app {
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+}
+
+// .el-table .el-table__cell {
+//     padding: 8px 0 !important;
+// }
+
+.el-popover.popper-no-padding {
+    min-width: unset !important;
+    padding: 0 !important;
+}
+
+.el-popover.popper-auto-width {
+    width: unset !important;
+    min-width: unset !important;
+    // padding: 0 !important;
+}
+
+.page {
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.flex-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-wrap {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.justify-start {
+    justify-content: flex-start;
+}
+
+.justify-end {
+    justify-content: flex-end;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.justify-between {
+    justify-content: space-between;
+}
+
+.justify-around {
+    justify-content: space-around;
+}
+
+.justify-evenly {
+    justify-content: space-evenly;
+}
+
+.items-start {
+    align-items: flex-start;
+}
+
+.items-end {
+    align-items: flex-end;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.items-baseline {
+    align-items: baseline;
+}
+
+.items-stretch {
+    align-items: stretch;
+}
+
+.self-start {
+    align-self: flex-start;
+}
+
+.self-end {
+    align-self: flex-end;
+}
+
+.self-center {
+    align-self: center;
+}
+
+.self-baseline {
+    align-self: baseline;
+}
+
+.self-stretch {
+    align-self: stretch;
+}
+
+.flex-1 {
+    flex: 1 1 0%;
+}
+
+.flex-auto {
+    flex: 1 1 auto;
+}
+
+.grow {
+    flex-grow: 1;
+}
+
+.grow-0 {
+    flex-grow: 0;
+}
+
+.shrink {
+    flex-shrink: 1;
+}
+
+
+.relative {
+    position: relative;
+}
+
+.roll-x {
+    overflow-x: scroll;
+}
+
+.roll-y {
+    overflow-y: scroll;
+}
+
+.roll-content {
+    flex-shrink: 0;
+}
+
+::-webkit-scrollbar {
+    /* 隐藏滚动条 */
+    display: none;
+}
