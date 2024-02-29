@@ -1,8 +1,8 @@
 import { indexStore } from '@/stores'
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import TableLayout from '../layout/TableLayout.vue'
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(),
   routes: [
     {
       meta: {
@@ -121,13 +121,8 @@ router.beforeEach((to, from, next) => {
     next("/login")
   }
   else{
-    next() // 跳转到下一个路由
+    next()
   }
-})
-
-router.beforeResolve((to, from, next) => {
-  // 在导航被确认之前的操作
-  next()
 })
 
 export default router

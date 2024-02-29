@@ -5,15 +5,11 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
-import legacyPlugin from '@vitejs/plugin-legacy'
 // vs code 编辑器配置
 import monacoEditorPlugin from 'vite-plugin-monaco-editor'
 // https://vitejs.dev/config/
 export default defineConfig({
   base: "./",
-  build:{
-    minify: false,
-  },
   plugins: [
     vue(),
     vueJsx(),
@@ -26,11 +22,6 @@ export default defineConfig({
     monacoEditorPlugin({
       languageWorkers: ['editorWorkerService', 'typescript', 'json', 'html']
     }),
-    legacyPlugin({
-      targets: ['defaults', 'not IE 11'],
-      additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
-      renderLegacyChunks: true,
-    })
   ],
   resolve: {
     alias: {
