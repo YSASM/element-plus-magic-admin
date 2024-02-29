@@ -6,7 +6,7 @@ const routes: Array<RouteRecordRaw> = [
       hidden: true
     },
     path: '/login',
-    component: import("../views/LoginPage.vue"),
+    component: () => import("@/views/LoginPage.vue"),
     children: []
   },
   {
@@ -15,7 +15,7 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       {
         path: "home",
-        component: import("@/views/HomeView.vue"),
+        component: () => import("@/views/HomeView.vue"),
         meta: {
           title: '首页',
           icon: 'House',
