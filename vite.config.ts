@@ -10,6 +10,20 @@ import monacoEditorPlugin from 'vite-plugin-monaco-editor'
 // https://vitejs.dev/config/
 export default defineConfig({
   base: "./",
+  build: {
+    chunkSizeWarningLimit:5000,
+    rollupOptions: {
+      output: {
+        // 分包
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            return id.toString().split('node_modules/')[1].split('/')[0].toString()
+          }
+        }
+      }
+    }
+  },
+  
   plugins: [
     vue(),
     vueJsx(),
@@ -19,7 +33,7 @@ export default defineConfig({
     Components({
       resolvers: [ElementPlusResolver()],
     }),
-    monacoEditorPlugin.default({
+    (monacoEditorPlugin as { default?: any }).default({
       languageWorkers: ['editorWorkerService', 'json']
     }),
   ],
