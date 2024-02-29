@@ -53,7 +53,8 @@ export default {
   },
   components: { ElementRender, TableElement },
   setup(props) {
-    const pathname = props.tableDataPath || location.pathname
+    const pathname = props.tableDataPath || location.hash.replace(/#/g,"")
+    console.log(pathname)
     const { currentRoute } = useRouter();
     const query: any = currentRoute.value.query;
     const tableDataFilePath = `../views${pathname.split('?')[0]}.tsx`;

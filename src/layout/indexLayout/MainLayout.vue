@@ -28,7 +28,7 @@ export default {
    },
    created() {
       router.afterEach(() => {
-         this.routeNow = location.pathname
+         this.routeNow = location.hash.replace(/#/g,"")
          this.hideMain = this.getHidden()
       })
    },

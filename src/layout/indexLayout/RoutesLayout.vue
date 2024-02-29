@@ -41,7 +41,7 @@ export default {
         }
     },
     setup(props) {
-        // var routeNow = location.pathname
+        // var routeNow = location.hash.replace(/#/g,"")
         function formatRoutes(routes: any) {
             let temp: any = []
             routes.forEach((route: any) => {
@@ -79,7 +79,7 @@ export default {
             this.$forceUpdate()
             this.$router.push(path)
             let timer:any = setInterval(()=>{
-                if(path===location.pathname){
+                if(path===location.hash.replace(/#/g,"")){
                     clearInterval(timer)
                     timer =null
                     this.$emit("reload")
