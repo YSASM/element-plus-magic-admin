@@ -31,7 +31,7 @@
 <script lang="ts">
 
 import { useRouter } from 'vue-router';
-import { indexStore } from "../../stores"
+import { indexStore } from "@/stores"
 
 export default {
     props:{
