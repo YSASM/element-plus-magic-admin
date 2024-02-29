@@ -19,8 +19,8 @@ export default defineConfig({
     Components({
       resolvers: [ElementPlusResolver()],
     }),
-    monacoEditorPlugin({
-      languageWorkers: ['editorWorkerService', 'typescript', 'json', 'html']
+    monacoEditorPlugin.default({
+      languageWorkers: ['editorWorkerService', 'json']
     }),
   ],
   resolve: {

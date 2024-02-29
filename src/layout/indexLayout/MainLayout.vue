@@ -27,10 +27,10 @@ export default {
       }
    },
    created() {
-      // router.afterEach(() => {
-      //    this.routeNow = location.pathname
-      //    this.hideMain = this.getHidden()
-      // })
+      router.afterEach(() => {
+         this.routeNow = location.hash.replace(/#/g,"")
+         this.hideMain = this.getHidden()
+      })
    },
    methods: {
       getHidden() {

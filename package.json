@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "license":"./LICENSE",
+  "license": "./LICENSE",
   "scripts": {
     "dev": "vite",
     "build": "vite build && node toFile.mjs",
@@ -16,9 +16,6 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
-    "@types/js-yaml": "^4.0.9",
-    "@types/qs": "^6.9.11",
-    "@vitejs/plugin-legacy": "^5.3.1",
     "axios": "^1.6.7",
     "clipboard": "^2.0.11",
     "element-plus": "^2.5.6",
