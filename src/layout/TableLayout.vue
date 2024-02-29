@@ -53,8 +53,7 @@ export default {
   },
   components: { ElementRender, TableElement },
   setup(props) {
-    const pathname = props.tableDataPath || location.hash.replace(/#/g,"")
-    console.log(pathname)
+    const pathname = props.tableDataPath || location.pathname
     const { currentRoute } = useRouter();
     const query: any = currentRoute.value.query;
     const tableDataFilePath = `../views${pathname.split('?')[0]}.tsx`;
@@ -242,6 +241,9 @@ export default {
           sortItem = item
         }
         const node = this.getNode(item, data)
+        if (!node) {
+          return
+        }
         item.node = node
       })
       if (sortItem) {
@@ -419,11 +421,9 @@ export default {
     },
     createForm(form: Form, row: any, rowTitle: boolean = false) {
       let type: any = ""
-      if (form.getDisable) {
-        let disable = this.renderArrFun(form.getDisable)(this.data, row)
-        if (form.disable != disable) {
-          form.disable = disable
-        }
+      let disable = form.disable
+      if (disable === undefined && form.getDisable) {
+        disable = this.renderArrFun(form.getDisable)(this.data, row)
       }
       if (typeof form.type == "function" || typeof form.type == "object") {
         type = this.renderArrFun(form.type)(this.data, row)
@@ -526,7 +526,7 @@ export default {
             }
           </el-form>
         </el-dialog >
-        <el-button disabled={form.disable} type={type} onClick={() => {
+        <el-button disabled={disable} type={type} onClick={() => {
           form.show = row.id
           this.$forceUpdate()
         }}>{rowTitle && form.key ? row[form.key] : form.title}</el-button>
@@ -680,6 +680,12 @@ export default {
             button.tableData = this.renderArrFun(button.createTable)(this.data, row)
           }
           if (button.tableData) {
+            if (this.tableDataPath) {
+              button.tableData.disable = true
+            }
+            else{
+              button.tableData.disable = undefined
+            }
             buttons.push(<div style="margin: 0 5px auto auto;">{this.createTable(button.tableData, row)}</div>)
           }
         }
@@ -697,7 +703,7 @@ export default {
       </el-popover>)
     },
     createTable(tableData: TableData, row: any, rowTitle: boolean = false) {
-      let disable:any = tableData.disable
+      let disable: any = tableData.disable
       if (tableData.getDisable) {
         disable = this.renderArrFun(tableData.getDisable)(this.data, row)
       }

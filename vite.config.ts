@@ -6,7 +6,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 // vs code 编辑器配置
-// import monacoEditorPlugin from 'vite-plugin-monaco-editor'
+import monacoEditorPlugin from 'vite-plugin-monaco-editor'
 // https://vitejs.dev/config/
 export default defineConfig({
   base:"./",
@@ -22,9 +22,9 @@ export default defineConfig({
     Components({
       resolvers: [ElementPlusResolver()],
     }),
-    // (monacoEditorPlugin as { default?: any }).default({
-    //   languageWorkers: ['json']
-    // }),
+    (monacoEditorPlugin as { default?: any }).default({
+      languageWorkers: ['json']
+    }),
   ],
   resolve: {
     alias: {

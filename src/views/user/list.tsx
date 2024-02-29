@@ -322,7 +322,6 @@ const data: TableData = {
             title: "订单",
             path: "/order/order",
             getDisable(self, row) {
-              console.log(row.vip_expire_time == "")
               return row.vip_expire_time == ""
             },
             renderRow: {

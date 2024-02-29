@@ -1,47 +1,25 @@
 <template>
     <div class="routes-layout">
         <div class="title" @click="goUrl('/')">{{ title }}</div>
-        <ul class="routes-list">
-            <li class="flex-col"
-                :class="routeNow === route.path ? 'route-now' : route.children && route.children.length > 0 && route.showChildren ? 'route-more' : route.children && route.children.length > 0 && !route.showChildren ? 'route-more-show' : 'route'"
-                v-for="route, index in routes" :key="index"
-                @click="routeNow !== route.path && (!route.children || route.children.length === 0) ? goUrl(route.path) : ''">
-                <div class="name flex-row" @click="route.children && route.children.length > 0 ? showMoreRotes(index) : ''">
-                    <el-icon class="icon"><component :is="route.meta.icon"></component></el-icon>
-                    {{ route.meta.title }}
-                    <el-icon v-if="route.children && route.children.length > 0" class="show-children">
-                        <ArrowDown />
-                    </el-icon>
-                </div>
-                <ul class="route-more-list" v-show="route.showChildren">
-                    <li class="flex-col"
-                        :class="routeNow === (route.path + '/' + route2.path).replace(/\/\//, '/') ? 'route-now' : route2.children && route2.children.length > 0 && route2.showChildren ? 'route-more' : route2.children && route2.children.length > 0 && !route2.showChildren ? 'route-more-show' : 'route'"
-                        v-for="route2, index in route.children" :key="index"
-                        @click="routeNow !== (route.path + '/' + route2.path).replace(/\/\//, '/') ? goUrl((route.path + '/' + route2.path).replace(/\/\//, '/')) : ''">
-                        <div class="name flex-row">
-                            <el-icon class="icon"><component :is="route2.meta.icon"></component></el-icon>
-                            {{ route2.meta.title }}
-                        </div>
-                    </li>
-                </ul>
-            </li>
-        </ul>
+        <RoutesListLayout :routes="routes" @go-url="goUrl" @show-children="showMoreRotes" :route-now="routeNow"></RoutesListLayout>
     </div>
 </template>
 <script lang="ts">
 
 import { useRouter } from 'vue-router';
 import { indexStore } from "@/stores"
-
+import RoutesListLayout from './RoutesListLayout.vue';
+import { reactive } from 'vue';
 export default {
-    props:{
-        routeNow:{
-            type:[String],
-            default:"/"
+    props: {
+        routeNow: {
+            type: [String],
+            default: "/"
         }
     },
+    components: { RoutesListLayout },
     setup(props) {
-        // var routeNow = location.hash.replace(/#/g,"")
+        // var routeNow = location.pathname
         function formatRoutes(routes: any) {
             let temp: any = []
             routes.forEach((route: any) => {
@@ -65,7 +43,7 @@ export default {
             })
             return temp
         }
-        var routes = formatRoutes(JSON.parse(JSON.stringify(useRouter().options.routes)))
+        var routes = reactive(formatRoutes(JSON.parse(JSON.stringify(useRouter().options.routes))))
         const title = indexStore().$state.title
         return {
             title,
@@ -76,18 +54,16 @@ export default {
     },
     methods: {
         goUrl(path: any) {
-            this.$forceUpdate()
+            path = path.replace(/\/\//g, "/")
             this.$router.push(path)
-            let timer:any = setInterval(()=>{
-                if(path===location.hash.replace(/#/g,"")){
-                    clearInterval(timer)
-                    timer =null
-                    this.$emit("reload")
-                }
-            },1)
+            setTimeout(()=>{
+                this.$emit("reload")
+            },10)
         },
         showMoreRotes(index: number) {
-            this.routes[index].showChildren = !this.routes[index].showChildren
+            const route = this.routes[index]
+            route.showChildren = !route.showChildren
+            this.routes[index] = route
             this.$forceUpdate()
         }
     }
@@ -110,84 +86,6 @@ export default {
         text-align: center;
     }
 
-    .routes-list {
-        list-style-type: none;
-        padding: 0;
 
-        .route-more-list {
-            width: 100%;
-            list-style-type: none;
-            padding: 0;
-            transition: height .3s;
-        }
-
-        .show-children {
-            margin: auto;
-            margin-right: 20px;
-            transition: transform .3s;
-        }
-
-        .name {
-            padding-left: 20px;
-            .icon{
-                align-self: center;
-            }
-        }
-
-        .route-more {
-            // height: 50px;
-            line-height: 50px;
-            vertical-align: middle;
-            color: rgba(255, 255, 255, 0.95);
-            background-color: rgb(33, 37, 43);
-            border-radius: 5px;
-            margin: 7px;
-            font-size: 14px;
-            transition: background-color .3s;
-        }
-
-        .route-more-show {
-            // height: 50px;
-            line-height: 50px;
-            vertical-align: middle;
-            color: rgba(255, 255, 255, 0.95);
-            background-color: rgb(33, 37, 43);
-            border-radius: 5px;
-            margin: 7px;
-            font-size: 14px;
-            transition: background-color .3s;
-
-            .show-children {
-                transform: rotate(180deg);
-            }
-        }
-
-        .route {
-            height: 50px;
-            line-height: 50px;
-            vertical-align: middle;
-            color: rgba(255, 255, 255, 0.95);
-            background-color: rgb(33, 37, 43);
-            border-radius: 5px;
-            margin: 7px;
-            font-size: 14px;
-            transition: background-color .3s;
-        }
-
-        .route-now {
-            height: 50px;
-            line-height: 50px;
-            vertical-align: middle;
-            color: rgba(255, 255, 255, 0.95);
-            background-color: #409eff;
-            border-radius: 5px;
-            margin: 7px;
-            font-size: 14px;
-        }
-
-        .route:hover {
-            background-color: #409eff;
-        }
-    }
 }
 </style>
