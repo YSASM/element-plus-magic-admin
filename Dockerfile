@@ -11,9 +11,6 @@ RUN npm config set registry https://registry.npmmirror.com && npm install yarn -
 
 RUN cd /app/src && yarn config set registry https://registry.npmmirror.com && yarn && yarn run build && cp -r dist/* /usr/share/nginx/html
 # # RUN cd /app/src && cp -r dist/* /usr/share/nginx/html
-
-
-
 # WORKDIR /app
 EXPOSE 9272
 
