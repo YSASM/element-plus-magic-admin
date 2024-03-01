@@ -36,6 +36,7 @@ import message from "@/utils/message"
 import utils from "@/utils"
 import TableLayout from "./TableLayout.vue"
 import JsonInputVue from "@/components/JsonInput.vue"
+import { ref } from "vue"
 export default {
   props: {
     tableDataPath: {
@@ -456,7 +457,7 @@ export default {
         return data
       }
       var errors: any = {}
-      form.disable = false
+      let formCan_tSub = ref(false)
       let formErrorsSeter = {
         addErrors(key?: any) {
           if (!errors) {
@@ -472,7 +473,7 @@ export default {
             key = 're_key_' + count
           }
           errors[key] = true
-          // form.disabled = this.checkErrors()
+          formCan_tSub.value = this.checkErrors()
           return key
         },
         checkErrors() {
@@ -489,7 +490,7 @@ export default {
             return
           }
           errors[key] = false
-          // form.disabled = this.checkErrors()
+          formCan_tSub.value = this.checkErrors()
         }
       }
       return (<div>
@@ -502,8 +503,9 @@ export default {
             if (form.show) {
               form.show = false
             }
-            errors = {}
-            form.disabled = false
+            for (let i in errors){
+              errors[i] = false
+            }
           }}
           width="500"
           v-slots={{
@@ -513,7 +515,7 @@ export default {
                   form.show = false
                   this.$forceUpdate()
                 }}>取消</el-button>
-                <el-button type="primary" disabled={form.disabled} onClick={() => {
+                <el-button type="primary" disabled={formCan_tSub.value} onClick={() => {
                   this.formSub(form, getData())
                 }}>
                   确认
@@ -530,9 +532,6 @@ export default {
                 }
                 return (<el-form-item ref={() => {
                   if (item.must) {
-                    if (form.disabled) {
-                      return
-                    }
                     const formItem: any = form.data[i]
                     const value = formItem.values[row.id]
                     if (!value) {
