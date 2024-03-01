@@ -1,5 +1,6 @@
 import type { RouteRecordRaw } from "vue-router"
 import TableLayout from '../layout/TableLayout.vue'
+import MainLayout from '../layout/MainLayout.vue'
 const routes: Array<RouteRecordRaw> = [
   {
     meta: {
@@ -12,6 +13,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     redirect: '/home',
+    component:MainLayout,
     children: [
       {
         path: "home",
@@ -29,6 +31,7 @@ const routes: Array<RouteRecordRaw> = [
       title: '用户管理',
       icon: 'Avatar',
     },
+    component: MainLayout,
     children: [
       {
         path: "list",
@@ -62,6 +65,7 @@ const routes: Array<RouteRecordRaw> = [
       title: '商品管理',
       icon: 'ShoppingCart',
     },
+    component: MainLayout,
     path: '/goods',
     children: [
       {
@@ -79,6 +83,7 @@ const routes: Array<RouteRecordRaw> = [
       title: '订单管理',
       icon: 'Money',
     },
+    component: MainLayout,
     path: '/order',
     children: [
       {
@@ -97,6 +102,7 @@ const routes: Array<RouteRecordRaw> = [
       title: '配置管理',
       icon: 'Setting',
     },
+    component: MainLayout,
     children: [
       {
         path: "config",
@@ -114,6 +120,7 @@ const routes: Array<RouteRecordRaw> = [
       icon: 'ChatSquare',
       range: ['/jgapi']
     },
+    component: MainLayout,
     path: '/prompt',
     children: [
       {
