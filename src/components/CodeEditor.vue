@@ -1,19 +1,22 @@
 <template>
   <div ref="monacoEditorRef" :style="monacoEditorStyle"></div>
-  <el-button :disabled="editorError" type="primary" class="sub" @click="sub">提交</el-button>
+  <el-button v-if="!hideSub" :disabled="editorError" type="primary" class="sub" @click="sub">提交</el-button>
 </template>
 
 <script setup lang="ts">
 import { useMonacoEditor } from './CodeEditor.hook'
-import { onMounted, computed, watch, ref } from 'vue'
-var editorError:any = ref(false)
+import { onMounted, computed, watch, ref, type Ref } from 'vue'
+var editorError: any = ref(false)
 const props = withDefaults(defineProps<{
+  hideSub?: boolean,
   width?: string | number,
   height?: string | number,
+  border?: string
   language?: string,
   editorOption?: Object,
-  modelValue: string
+  modelValue: string | Object | Array<any>
 }>(), {
+  hideSub: false,
   width: '800px',
   height: '600px',
   language: 'json',
@@ -23,7 +26,7 @@ const props = withDefaults(defineProps<{
 
 const emits = defineEmits<{
   (e: 'blue'): void,
-  (e: 'change', val: string): void
+  (e: 'change', val: string, error: Ref<boolean>): void
   (e: 'sub'): void
 }>()
 
@@ -34,22 +37,28 @@ const { monacoEditorRef, createEditor, updateVal, updateOptions, getEditor } = u
 const monacoEditorStyle = computed(() => {
   return {
     width: typeof props.width === 'string' ? props.width : props.width + 'px',
-    height: typeof props.height === 'string' ? props.height : props.height + 'px'
+    height: typeof props.height === 'string' ? props.height : props.height + 'px',
+    border: props.border
   }
 })
 
 onMounted(() => {
   const monacoEditor = createEditor(props.editorOption)
-  updateMonacoVal(props.modelValue)
+  let mv: any = props.modelValue
+  if (typeof mv == "object") {
+    mv = JSON.stringify(mv)
+    emits('change', mv, editorError)
+  }
+  updateMonacoVal(mv)
   monacoEditor?.onDidChangeModelContent(() => {
     let value = monacoEditor!.getValue()
-    try{
+    try {
       JSON.parse(value)
-      emits('change', value)
       editorError.value = false
-    }catch(e){
+    } catch (e) {
       editorError.value = true
     }
+    emits('change', value, editorError)
   })
   monacoEditor?.onDidBlurEditorText(() => {
     emits('blue')
@@ -57,7 +66,12 @@ onMounted(() => {
 })
 
 watch(() => props.modelValue, () => {
-  updateMonacoVal(props.modelValue)
+  let mv: any = props.modelValue
+  if (typeof mv == "object") {
+    mv = JSON.stringify(mv)
+    emits('change', mv, editorError)
+  }
+  updateMonacoVal(mv)
 })
 
 function updateMonacoVal(val: string) {
@@ -70,7 +84,7 @@ defineExpose({ updateOptions })
 </script>
 
 <style scoped>
-.sub{
+.sub {
   width: 100%;
 }
 </style>

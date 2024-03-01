@@ -16,6 +16,9 @@ export interface FormData {
     values?: {
         [prop: string]: any
     }
+    errors?:{
+        [prop: string]: any
+    }
     getValue?: (((self: TableData, row: {
         [prop: string]: any
     }) => any)) | Array<string>
@@ -25,7 +28,7 @@ export interface FormData {
     closeStr?: string
     disableLabel?: boolean
     [prop: string]: any
-    type: "input" | "select" | "cascader" | "datetimerange" | "switch" | "datetime" | "none"
+    type: "input" | "select" | "cascader" | "datetimerange" | "switch" | "datetime" | "json" | "none"
     disable?: boolean
     getDisable?: ((self: TableData, data: {
         [prop: string]: any
@@ -164,7 +167,7 @@ export interface Fliter {
     key?: string
     startKey?: string
     endKey?: string
-    type?: "input" | "select" | "cascader" | "datetimerange" | "switch" | "form"
+    type?: "input" | "select" | "cascader" | "datetimerange" | "switch" | "dialogForm"
     rows?: number
     items?: Array<{
         name: string

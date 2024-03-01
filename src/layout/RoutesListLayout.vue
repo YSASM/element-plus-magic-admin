@@ -1,7 +1,7 @@
 <template>
     <ul class="routes-list">
         <li class="flex-col"
-            :class="routeNow === fatherPath+'/'+route.path ? 'route-now' : route.children && route.children.length > 0 && route.showChildren ? 'route-more' : route.children && route.children.length > 0 && !route.showChildren ? 'route-more-show' : 'route'"
+            :class="routeNow === route.path ? 'route-now' : route.children && route.children.length > 0 && route.showChildren ? 'route-more' : route.children && route.children.length > 0 && !route.showChildren ? 'route-more-show' : 'route'"
             v-for="route, index in routes" :key="index"
             @click="routeNow !== route.path && (!route.children || route.children.length === 0) ? $emit('goUrl', route.path) : ''">
             <div class="name flex-row"
@@ -16,7 +16,7 @@
             </div>
             <RoutesListLayout :father-path="fatherPath+route.path" v-if="route.children && route.children.length > 0 && route.showChildren"
                 :routes="route.children" :route-now="routeNow" @update-routes="(i) => { $emit('updateRoutes', routes) }"
-                @go-url="(r) => { $emit('goUrl', route.path + '/' + r) }" />
+                @go-url="(r) => { $emit('goUrl', r) }" />
         </li>
     </ul>
 </template>

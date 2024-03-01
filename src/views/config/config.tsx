@@ -30,7 +30,7 @@ const data: TableData = {
         },
         {
             name: '新建',
-            type: 'form',
+            type: "dialogForm",
             disableLabel: true,
             form: {
                 title: "新建",

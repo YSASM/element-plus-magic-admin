@@ -1,7 +1,8 @@
 <template>
     <div class="routes-layout">
         <div class="title" @click="goUrl('/')">{{ title }}</div>
-        <RoutesListLayout :routes="routes" @go-url="goUrl" @show-children="showMoreRotes" :route-now="routeNow"></RoutesListLayout>
+        <RoutesListLayout :routes="routes" @go-url="goUrl" @show-children="showMoreRotes" :route-now="routeNow">
+        </RoutesListLayout>
     </div>
 </template>
 <script lang="ts">
@@ -19,11 +20,14 @@ export default {
     },
     components: { RoutesListLayout },
     setup(props) {
-        // var routeNow = location.pathname
+        // var routeNow = location.pathna
+        const store = indexStore()
+        const title = store.$state.title
+        const baseUrl = store.$state.baseUrl
         function formatRoutes(routes: any) {
             let temp: any = []
             routes.forEach((route: any) => {
-                if (route.meta && route.meta.hidden) {
+                if (route.meta && (route.meta.hidden || route.meta.range && !route.meta.range.includes(baseUrl))) {
                     return
                 }
                 if (route.children.length === 1) {
@@ -34,7 +38,8 @@ export default {
                 else if (route.children.length > 1) {
                     route.showChildren = false
                     route.children.forEach((route2: any) => {
-                        if ((route.path + "/" + route2.path).replace(/\/\//, "/") === props.routeNow) {
+                        route2.path = (route.path + "/" + route2.path).replace(/\/\//, "/")
+                        if (route2.path === props.routeNow) {
                             route.showChildren = true
                         }
                     })
@@ -44,21 +49,18 @@ export default {
             return temp
         }
         var routes = reactive(formatRoutes(JSON.parse(JSON.stringify(useRouter().options.routes))))
-        const title = indexStore().$state.title
+
         return {
             title,
-            routes,
+            routes
         }
-    },
-    created() {
     },
     methods: {
         goUrl(path: any) {
-            path = path.replace(/\/\//g, "/")
             this.$router.push(path)
-            setTimeout(()=>{
+            setTimeout(() => {
                 this.$emit("reload")
-            },10)
+            }, 10)
         },
         showMoreRotes(index: number) {
             const route = this.routes[index]

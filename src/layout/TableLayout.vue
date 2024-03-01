@@ -61,25 +61,34 @@ export default {
     const apiFilePath = `../api${pathname.split('?')[0]}.ts`;
     const apiModule: Function = import.meta.glob("../api/**/**.ts")[apiFilePath];
     return {
+      tableDataFilePath,
+      apiFilePath,
       apiModule,
       tableDataModule,
       query
     };
   },
   async created() {
+    if (!this.tableDataModule) {
+      console.error("未找到表格文件:" + this.tableDataFilePath)
+      return
+    }
     const data_temp: any = await this.tableDataModule();
     const data: TableData = data_temp.default
     this.data = data;
-    const api_temp: any = await this.apiModule()
-    this.data.api = api_temp.default
+    if (this.apiModule) {
+      const api_temp: any = await this.apiModule()
+      this.data.api = api_temp.default ? api_temp.default : undefined
+    }
     if (!this.data.api) {
+      console.log("未找到API文件或未加载成功:" + this.apiFilePath)
       this.data.api = {
         apiTest: this.apiTest
       }
-    }
-    else {
+    } else {
       this.data.api.apiTest = this.apiTest
     }
+
     if (!this.data.methods) {
       this.data.methods = {}
     }
@@ -402,7 +411,7 @@ export default {
             }} >
           </el-switch>)
         }
-        case "form": {
+        case "dialogForm": {
           if (item.createForm) {
             item.form = this.renderArrFun(item.createForm)(this.data)
           }
@@ -443,6 +452,25 @@ export default {
         return data
       }
       form.errors = []
+      let formErrorsSeter = {
+        addErrors(key?: any) {
+          if (key) {
+            form.errors[key] = true
+          }
+          else {
+            form.errors.push(true)
+          }
+          form.disabled = form.errors.includes(true)
+          return form.errors.length
+        },
+        getErrors(key: any) {
+          return form.errors[key]
+        },
+        delErrors(key: any) {
+          form.errors[key] = false
+          form.disabled = form.errors.includes(true)
+        }
+      }
       return (<div>
         <el-dialog
           modelValue={form.show === row.id}
@@ -485,16 +513,15 @@ export default {
                     const formItem: any = form.data[i]
                     const value = formItem.values[row.id]
                     if (!value) {
-                      form.errors[i] = true
+                      formErrorsSeter.addErrors(i)
                     } else {
                       if (formItem.validator && this.renderArrFun(formItem.validator)(this.data, getData())) {
-                        form.errors[i] = true
+                        formErrorsSeter.addErrors(i)
                       }
                       else {
-                        form.errors[i] = false
+                        formErrorsSeter.delErrors(i)
                       }
                     }
-                    form.disabled = form.errors.includes(true)
                   }
                 }} prop="none" rules={item.must ? [{
                   required: true, trigger: ['blur', 'change'],
@@ -502,7 +529,7 @@ export default {
                     const formItem: any = form.data[i]
                     const value = formItem.values[row.id]
                     if (!value) {
-                      form.errors[i] = true
+                      formErrorsSeter.addErrors(i)
                       callback(new Error("必填项"))
                     } else {
                       let validator: any = false
@@ -510,17 +537,16 @@ export default {
                         validator = this.renderArrFun(formItem.validator)(this.data, getData())
                       }
                       if (validator) {
-                        form.errors[i] = true
+                        formErrorsSeter.addErrors(i)
                         callback(new Error(validator))
                       }
                       else {
-                        form.errors[i] = false
+                        formErrorsSeter.delErrors(i)
                       }
                     }
-                    form.disabled = form.errors.includes(true)
                   }
                 }] : []} label={item.name}>
-                  {this.getFormNode(item, row, getData)}
+                  {this.getFormNode(item, row, getData, formErrorsSeter)}
                 </el-form-item>)
               })
             }
@@ -533,9 +559,16 @@ export default {
       </div >
       )
     },
-    getFormNode(item: FormData, row: any, getData: any) {
+    getFormNode(item: FormData, row: any, getData: any, formErrorsSeter: {
+      addErrors: (key?: any) => any
+      getErrors: (key: any) => any
+      delErrors: (key: any) => void
+    }) {
       if (!item.values) {
         item.values = {}
+      }
+      if (!item.errors) {
+        item.errors = {}
       }
       if (item.values[row.id] === undefined) {
         if (item.getValue) {
@@ -553,7 +586,6 @@ export default {
           item.disable = disable
         }
       }
-      console.log(item.key, item.disable)
       switch (item.type) {
         case "none": {
           return null
@@ -643,6 +675,35 @@ export default {
             inactive-value={item.closeValue}>
           </el-switch>)
         }
+        case "json": {
+          return (<CodeEditor
+            modelValue={item.values[row.id]}
+            hideSub={true}
+            width="100%"
+            height="300px"
+            border="var(--el-border)"
+            onChange={(e, error) => {
+              if (item.values) {
+                item.values[row.id] = e
+              }
+              if (item.errors) {
+                if (error.value) {
+                  if (!item.errors[row.id]) {
+                    item.errors[row.id] = formErrorsSeter.addErrors()
+                  }
+                  else {
+                    formErrorsSeter.addErrors(item.errors[row.id])
+                  }
+                }
+                else {
+                  if (item.errors[row.id]) {
+                    formErrorsSeter.delErrors(item.errors[row.id])
+                  }
+                }
+              }
+            }}
+          ></CodeEditor>)
+        }
       }
       return (<div></div>)
     },
@@ -683,7 +744,7 @@ export default {
             if (this.tableDataPath) {
               button.tableData.disable = true
             }
-            else{
+            else {
               button.tableData.disable = undefined
             }
             buttons.push(<div style="margin: 0 5px auto auto;">{this.createTable(button.tableData, row)}</div>)
@@ -1043,6 +1104,7 @@ export default {
       typeof this.data.beforeFetch == "function" && this.data.beforeFetch(this.data, fliter)
       if (!this.data.fetchFun) {
         console.error("未配置fetchFun")
+        this.data.ready = true
         return
       }
       this.renderArrFun(this.data.fetchFun)(this.data, fliter).then((res: any) => {

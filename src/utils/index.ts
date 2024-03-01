@@ -72,5 +72,17 @@ export default {
       return true
     }
     return false
+  },
+  parseJson(s: string) {
+    const rev = (key: any, value: any) => {
+      try {
+        value = JSON.parse(value, rev)
+      } catch (e) {
+        // 
+      }
+      return value
+    }
+    const value = JSON.parse(s, rev)
+    return value
   }
 }

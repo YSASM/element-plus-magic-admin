@@ -4,6 +4,7 @@
 </template>
 
 <script lang="ts">
+import utils from '@/utils'
 import message from '@/utils/message'
 import clipboard from "clipboard"
 export default {
@@ -143,15 +144,7 @@ export default {
           this.code = this.formatJson(this.value)
         }
         else {
-          const rev = (key:any,value:any)=>{
-            try{
-              value = JSON.parse(value,rev)
-            }catch(e){
-              // 
-            }
-            return value
-          }
-          const value = JSON.parse(this.value,rev)
+          const value = utils.parseJson(this.value)
           if (typeof value == "object") {
             this.code = this.formatJson(value)
           }

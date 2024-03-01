@@ -108,6 +108,25 @@ const routes: Array<RouteRecordRaw> = [
       }
     ]
   },
+  {
+    meta: {
+      title: '提示词管理',
+      icon: 'atlas',
+      range: ['/jgapi']
+    },
+    path: '/prompt',
+    children: [
+      {
+        path: 'prompt',
+        name: 'prompt',
+        component: TableLayout,
+        meta: {
+          title: '提示词管理',
+          icon: 'atlas',
+        },
+      }
+    ],
+  },
 ]
 
 export default routes

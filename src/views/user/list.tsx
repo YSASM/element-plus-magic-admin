@@ -368,7 +368,7 @@ const data: TableData = {
               return row.getui_status == ''
             },
             subFun(self, data) {
-              return self.api?.apiTest && self.api?.apiTest(data)
+              return self.api?.pushMessage(data)
             },
             data: [
               {
@@ -388,6 +388,24 @@ const data: TableData = {
                 type: 'input',
                 must: true
               },
+              {
+                name: '跳转页面',
+                key: 'intent',
+                type: 'input',
+                rows: 2,
+                must: true
+              },
+              {
+                name: "跳转参数",
+                key: "payload",
+                type: "json",
+                getValue() {
+                  return {
+                    "intent": "",
+                    "params": ""
+                  }
+                },
+              }
             ]
           }
         },

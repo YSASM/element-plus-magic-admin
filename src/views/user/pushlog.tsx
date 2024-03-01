@@ -43,12 +43,14 @@ const data: TableData = {
         },
     ],
     tableColumns: [
-        { key: "id", name: "ID", align: "center", width: "250px", fixed: "left", sort: "desc", showJson: "*" },
-        { key: "user_id", name: "用户ID", align: "center", width: "250px", },
-        { key: "title", name: "标题", align: "center", width: "280px", },
-        { key: "message", name: "正文", align: "center", width: "280px", },
+        { key: "id", name: "ID", align: "center", width: "100px", fixed: "left", sort: "desc", showJson: "*" },
+        { key: "user_id", name: "用户ID", align: "center", width: "180px", },
+        { key: "title", name: "标题", align: "center", width: "180px", },
+        { key: "message", name: "正文", align: "center", width: "180px", },
+        { key: "intent", name: "跳转页面", align: "center", width: "180px", },
+        { key: "payload", name: "跳转参数", align: "center", width: "200px", showJson: "payload" },
         {
-            key: "status", name: "状态", align: "center", width: "280px", showTag: {
+            key: "status", name: "状态", align: "center", width: "100px", showTag: {
                 "已发送": {
                     type: 'success',
                     content: '已发送'
@@ -63,8 +65,61 @@ const data: TableData = {
                 },
             }
         },
-        { key: "create_time", name: "创建时间", align: "center", width: "290px", sort: "" },
-        { key: "update_time", name: "更新时间", align: "center", width: "290px", sort: "" },
+        { key: "create_time", name: "创建时间", align: "center", width: "200px", sort: "" },
+        { key: "update_time", name: "更新时间", align: "center", width: "200px", sort: "" },
+        {
+            key: "table_tools", name: "操作",
+            buttons: [
+                {
+                    type: "dialogForm",
+                    form: {
+                        type: "info",
+                        title: "推送",
+                        successMsg: "推送成功",
+                        subFun(self, data) {
+                            return self.api?.pushMessage(data)
+                        },
+                        data: [
+                            {
+                                key: "msgid",
+                                type: "none",
+                                getValue: (self, row) => row.id,
+                            },
+                            {
+                                name: '标题',
+                                key: 'title',
+                                type: 'input',
+                                must: true,
+                            },
+                            {
+                                name: '正文',
+                                key: 'message',
+                                type: 'input',
+                                must: true
+                            },
+                            {
+                                name: '跳转页面',
+                                key: 'intent',
+                                type: 'input',
+                                rows: 2,
+                                must: true
+                            },
+                            {
+                                name: "跳转参数",
+                                key: "payload",
+                                type: "json",
+                                getValue(self, row) {
+                                    return self.methods?.utils?.parseJson(row.payload) || {
+                                        "intent": "",
+                                        "params": ""
+                                    }
+                                },
+                            }
+                        ]
+                    }
+                },
+            ]
+        }
     ]
 }
 
