@@ -2,7 +2,7 @@
    <router-view v-if="hideMain && !isReloading" />
    <div v-else class="main flex-row">
       <div class="left-routes">
-         <RoutesLayout :routeNow="routeNow" @reload="reload"></RoutesLayout>
+         <RoutesLayout :routeNow="routeNow"></RoutesLayout>
       </div>
       <div class="right-content flex-col">
          <TopLayout class="top-bar"></TopLayout>
@@ -10,26 +10,34 @@
       </div>
    </div>
 </template>
-<script setup lang="ts">
+
+<script lang="ts">
 import { useRouter } from 'vue-router'
 import RoutesLayout from "@/layout/RoutesLayout.vue"
 import TopLayout from "@/layout/TopLayout.vue"
 import router from "@/router"
-</script>
-
-<script lang="ts">
 export default {
    data() {
       return {
          isReloading: false,
          hideMain: true,
-         routeNow: "/"
       }
+   },
+   setup() {
+      const routeNow = location.pathname
+      return {
+         routeNow
+      }
+   },
+   components:{
+      RoutesLayout,
+      TopLayout
    },
    created() {
       router.afterEach(() => {
          this.routeNow = location.pathname
          this.hideMain = this.getHidden()
+         this.reload()
       })
    },
    methods: {

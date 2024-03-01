@@ -10,7 +10,7 @@ export const indexStore = defineStore('index', {
         }
     },
     persist: {
-        storage: sessionStorage,
+        storage: localStorage,
         serializer: {
             deserialize: JSON.parse,
             serialize: JSON.stringify

@@ -58,9 +58,6 @@ export default {
     methods: {
         goUrl(path: any) {
             this.$router.push(path)
-            setTimeout(() => {
-                this.$emit("reload")
-            }, 10)
         },
         showMoreRotes(index: number) {
             const route = this.routes[index]
