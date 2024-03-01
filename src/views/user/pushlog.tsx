@@ -43,12 +43,15 @@ const data: TableData = {
         },
     ],
     tableColumns: [
-        { key: "id", name: "ID", align: "center", width: "100px", fixed: "left", sort: "desc", showJson: "*" },
-        { key: "user_id", name: "用户ID", align: "center", width: "180px", },
-        { key: "title", name: "标题", align: "center", width: "180px", },
+        { key: "id", name: "ID", align: "center", width: "80px", fixed: "left", sort: "desc", showJson: "*" },
+        { key: "user_id", name: "用户ID", align: "center", width: "100px", },
+        { key: "brand", name: "手机品牌", width: "120px" },
+        { key: "model", name: "手机型号", width: "120px" },
+        { key: "cid", name: "个推ID", width: "180px" },
+        { key: "title", name: "标题", align: "center", width: "100px", },
         { key: "message", name: "正文", align: "center", width: "180px", },
-        { key: "intent", name: "启动页面", align: "center", width: "180px", },
-        { key: "payload", name: "启动参数", align: "center", width: "200px", showJson: "payload" },
+        { key: "intent", name: "启动页面", align: "center", width: "100px", },
+        { key: "payload", name: "启动参数", align: "center", width: "180px", showJson: "payload" },
         {
             key: "status", name: "状态", align: "center", width: "100px", showTag: {
                 "已发送": {

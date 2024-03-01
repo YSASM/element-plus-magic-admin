@@ -87,5 +87,8 @@ export default {
   },
   getPathName(){
     return location.hash.replace(/#/g,"")
-  }
+  },
+  hmTsTos(ts:number){
+    return (ts/1000).toFixed()
+  },
 }

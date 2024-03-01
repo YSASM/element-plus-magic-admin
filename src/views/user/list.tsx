@@ -15,13 +15,13 @@ const data: TableData = {
       value: ""
     },
     {
-      name: '推送Id',
+      name: '推送ID',
       key: 'cid',
       type: "input",
       value: ""
     },
     {
-      name: '微信Id',
+      name: '微信ID',
       key: 'unionid',
       type: "input",
       value: ""
@@ -322,6 +322,23 @@ const data: TableData = {
     { key: "create_time", name: "激活时间", width: "200px", sort: "desc" },
     {
       key: "table_tools", name: "操作", buttons: [
+        {
+          type: "dialogTable",
+          tableData: {
+            title: "Token",
+            path: "/user/token",
+            renderRow: {
+              fliter: [
+                {
+                  key: "user_id",
+                  value: {
+                    row: "id"
+                  }
+                }
+              ]
+            }
+          }
+        },
         {
           type: "dialogTable",
           tableData: {
