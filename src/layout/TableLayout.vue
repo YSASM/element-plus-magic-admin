@@ -456,6 +456,7 @@ export default {
         return data
       }
       var errors: any = {}
+      form.disable = false
       let formErrorsSeter = {
         addErrors(key?: any) {
           if (!errors) {
@@ -471,7 +472,7 @@ export default {
             key = 're_key_' + count
           }
           errors[key] = true
-          form.disabled = this.checkErrors()
+          // form.disabled = this.checkErrors()
           return key
         },
         checkErrors() {
@@ -488,7 +489,7 @@ export default {
             return
           }
           errors[key] = false
-          form.disabled = this.checkErrors()
+          // form.disabled = this.checkErrors()
         }
       }
       return (<div>
