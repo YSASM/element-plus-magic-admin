@@ -151,7 +151,7 @@ const data: TableData = {
                 type: "text",
                 key:"ename",
                 subFun(self, data) {
-                    return self.api?.apiTest&&self.api?.apiTest(data)
+                    return self.api?.editorUserEventList(data)
                 },
                 data: [
                     {
