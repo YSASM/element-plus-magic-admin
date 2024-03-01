@@ -389,21 +389,21 @@ const data: TableData = {
                 must: true
               },
               {
-                name: '跳转页面',
+                name: '启动页面',
                 key: 'intent',
                 type: 'input',
                 rows: 2,
                 must: true
               },
               {
-                name: "跳转参数",
+                name: "启动参数",
                 key: "payload",
                 type: "json",
                 getValue() {
                   return {
-                    "intent": "",
-                    "params": ""
-                  }
+                    "page": "跳转页面",
+                    "params":"跳转参数"
+                    }
                 },
               }
             ]

@@ -47,8 +47,8 @@ const data: TableData = {
         { key: "user_id", name: "用户ID", align: "center", width: "180px", },
         { key: "title", name: "标题", align: "center", width: "180px", },
         { key: "message", name: "正文", align: "center", width: "180px", },
-        { key: "intent", name: "跳转页面", align: "center", width: "180px", },
-        { key: "payload", name: "跳转参数", align: "center", width: "200px", showJson: "payload" },
+        { key: "intent", name: "启动页面", align: "center", width: "180px", },
+        { key: "payload", name: "启动参数", align: "center", width: "200px", showJson: "payload" },
         {
             key: "status", name: "状态", align: "center", width: "100px", showTag: {
                 "已发送": {
@@ -98,20 +98,20 @@ const data: TableData = {
                                 must: true
                             },
                             {
-                                name: '跳转页面',
+                                name: '启动页面',
                                 key: 'intent',
                                 type: 'input',
                                 rows: 2,
                                 must: true
                             },
                             {
-                                name: "跳转参数",
+                                name: "启动参数",
                                 key: "payload",
                                 type: "json",
                                 getValue(self, row) {
                                     return self.methods?.utils?.parseJson(row.payload) || {
-                                        "intent": "",
-                                        "params": ""
+                                        "page": "跳转页面",
+                                        "params": "跳转参数"
                                     }
                                 },
                             }

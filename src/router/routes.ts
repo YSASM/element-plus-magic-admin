@@ -111,7 +111,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     meta: {
       title: '提示词管理',
-      icon: 'atlas',
+      icon: 'ChatSquare',
       range: ['/jgapi']
     },
     path: '/prompt',
@@ -122,7 +122,7 @@ const routes: Array<RouteRecordRaw> = [
         component: TableLayout,
         meta: {
           title: '提示词管理',
-          icon: 'atlas',
+          icon: 'ChatSquare',
         },
       }
     ],
