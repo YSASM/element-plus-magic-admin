@@ -13,12 +13,6 @@ export interface FormData {
     form?: Form
     emptyLabel?: string
     opt?: any
-    values?: {
-        [prop: string]: any
-    }
-    errors?:{
-        [prop: string]: any
-    }
     getValue?: (((self: TableData, row: {
         [prop: string]: any
     }) => any)) | Array<string>

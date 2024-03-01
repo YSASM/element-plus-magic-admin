@@ -77,7 +77,7 @@ const data: TableData = {
                         title: "重发",
                         successMsg: "推送成功",
                         subFun(self, data) {
-                            return self.api?.editorUserEventList(data)
+                            return self.api?.pushMessage(data)
                         },
                         data: [
                             {

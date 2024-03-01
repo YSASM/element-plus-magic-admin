@@ -75,11 +75,11 @@ export default {
       return
     }
     const data_temp: any = await this.tableDataModule();
-    const data: TableData = data_temp.default
+    const data: TableData = utils.deepClone(data_temp.default)
     this.data = data;
     if (this.apiModule) {
       const api_temp: any = await this.apiModule()
-      this.data.api = api_temp.default ? api_temp.default : undefined
+      this.data.api = api_temp.default ? utils.deepClone(api_temp.default) : undefined
     }
     if (!this.data.api) {
       console.log("未找到API文件或未加载成功:" + this.apiFilePath)
@@ -452,7 +452,7 @@ export default {
         }
         return data
       }
-      var errors:any = {}
+      var errors: any = {}
       let formErrorsSeter = {
         addErrors(key?: any) {
           if (!errors) {
@@ -524,12 +524,30 @@ export default {
                 if (item.hide) {
                   return null
                 }
+                console.log("inrow")
+                const formItem: any = form.data[i]
+                if (!formItem.values) {
+                  formItem.values = {}
+                }
+                if (form.show === row.id) {
+                  if (item.getValue) {
+                    formItem.values[row.id] = this.renderArrFun(item.getValue)(this.data, row)
+                  }
+                  else {
+                    if (item.key) {
+                      formItem.values[row.id] = row[item.key]
+                    }
+                  }
+                }else{
+                  if(formItem.values[row.id]!==undefined){
+                    formItem.values[row.id] = undefined
+                  }
+                }
                 return (<el-form-item ref={() => {
                   if (item.must) {
                     if (form.disabled) {
                       return
                     }
-                    const formItem: any = form.data[i]
                     const value = formItem.values[row.id]
                     if (!value) {
                       formErrorsSeter.addErrors('form_ai_' + i)
@@ -545,7 +563,6 @@ export default {
                 }} prop="none" rules={item.must ? [{
                   required: true, trigger: ['blur', 'change'],
                   validator: (_: any, __: any, callback: any) => {
-                    const formItem: any = form.data[i]
                     const value = formItem.values[row.id]
                     if (!value) {
                       formErrorsSeter.addErrors('form_ai_' + i)
@@ -582,21 +599,8 @@ export default {
       addErrors: (key?: any) => any
       delErrors: (key: any) => void
     }) {
-      if (!item.values) {
-        item.values = {}
-      }
       if (!item.errors) {
         item.errors = {}
-      }
-      if (item.values[row.id] === undefined) {
-        if (item.getValue) {
-          item.values[row.id] = this.renderArrFun(item.getValue)(this.data, row)
-        }
-        else {
-          if (item.key) {
-            item.values[row.id] = row[item.key]
-          }
-        }
       }
       if (item.getDisable) {
         let disable = this.renderArrFun(item.getDisable)(this.data, getData())
