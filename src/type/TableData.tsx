@@ -28,7 +28,7 @@ export interface FormData {
     closeStr?: string
     disableLabel?: boolean
     [prop: string]: any
-    type: "input" | "select" | "cascader" | "datetimerange" | "switch" | "datetime" | "json" | "none"
+    type: "input" | "select" | "cascader" | "datetimerange" | "switch" | "datetime" | "json" | "jsonInput" | "none"
     disable?: boolean
     getDisable?: ((self: TableData, data: {
         [prop: string]: any

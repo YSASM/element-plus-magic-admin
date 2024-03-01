@@ -164,7 +164,7 @@ export default {
 <style lang="scss" scoped>
 .jsonview {
   width: 100%;
-  height: 500px;
+  max-height: 500px;
   overflow-y: auto;
   text-align: start;
   word-break: break-all;

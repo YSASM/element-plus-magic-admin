@@ -33,7 +33,7 @@ const emits = defineEmits<{
 const sub = () => {
   emits('sub');
 }
-const { monacoEditorRef, createEditor, updateVal, updateOptions, getEditor } = useMonacoEditor(props.language)
+const { monacoEditorRef, createEditor, updateVal, updateOptions, getEditor, formatDoc } = useMonacoEditor(props.language)
 const monacoEditorStyle = computed(() => {
   return {
     width: typeof props.width === 'string' ? props.width : props.width + 'px',
@@ -50,6 +50,7 @@ onMounted(() => {
     emits('change', mv, editorError)
   }
   updateMonacoVal(mv)
+  formatDoc()
   monacoEditor?.onDidChangeModelContent(() => {
     let value = monacoEditor!.getValue()
     try {

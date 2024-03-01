@@ -73,11 +73,11 @@ const data: TableData = {
                 {
                     type: "dialogForm",
                     form: {
-                        type: "info",
-                        title: "推送",
+                        type: "primary",
+                        title: "重发",
                         successMsg: "推送成功",
                         subFun(self, data) {
-                            return self.api?.pushMessage(data)
+                            return self.api?.apiTest(data)
                         },
                         data: [
                             {
@@ -107,7 +107,7 @@ const data: TableData = {
                             {
                                 name: "启动参数",
                                 key: "payload",
-                                type: "json",
+                                type: "jsonInput",
                                 getValue(self, row) {
                                     return self.methods?.utils?.parseJson(row.payload) || {
                                         "page": "跳转页面",

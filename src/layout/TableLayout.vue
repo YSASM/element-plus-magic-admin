@@ -35,6 +35,7 @@ import TableElement from "./TableElement.vue"
 import message from "@/utils/message"
 import utils from "@/utils"
 import TableLayout from "./TableLayout.vue"
+import JsonInputVue from "@/components/JsonInput.vue"
 export default {
   props: {
     tableDataPath: {
@@ -451,24 +452,40 @@ export default {
         }
         return data
       }
-      form.errors = []
+      var errors:any = {}
       let formErrorsSeter = {
         addErrors(key?: any) {
-          if (key) {
-            form.errors[key] = true
+          if (!errors) {
+            errors = {}
           }
-          else {
-            form.errors.push(true)
+          if (!key) {
+            let count = 0
+            for (let _ in errors) {
+              _
+              count++
+            }
+            count++
+            key = 're_key_' + count
           }
-          form.disabled = form.errors.includes(true)
-          return form.errors.length
+          errors[key] = true
+          form.disabled = this.checkErrors()
+          return key
         },
-        getErrors(key: any) {
-          return form.errors[key]
+        checkErrors() {
+          for (let key in errors) {
+            if (errors[key]) {
+              return true
+            }
+          }
+          return false
         },
         delErrors(key: any) {
-          form.errors[key] = false
-          form.disabled = form.errors.includes(true)
+          if (!errors) {
+            errors = {}
+            return
+          }
+          errors[key] = false
+          form.disabled = this.checkErrors()
         }
       }
       return (<div>
@@ -481,6 +498,8 @@ export default {
             if (form.show) {
               form.show = false
             }
+            errors = {}
+            form.disabled = false
           }}
           width="500"
           v-slots={{
@@ -513,13 +532,13 @@ export default {
                     const formItem: any = form.data[i]
                     const value = formItem.values[row.id]
                     if (!value) {
-                      formErrorsSeter.addErrors(i)
+                      formErrorsSeter.addErrors('form_ai_' + i)
                     } else {
                       if (formItem.validator && this.renderArrFun(formItem.validator)(this.data, getData())) {
-                        formErrorsSeter.addErrors(i)
+                        formErrorsSeter.addErrors('form_ai_' + i)
                       }
                       else {
-                        formErrorsSeter.delErrors(i)
+                        formErrorsSeter.delErrors('form_ai_' + i)
                       }
                     }
                   }
@@ -529,7 +548,7 @@ export default {
                     const formItem: any = form.data[i]
                     const value = formItem.values[row.id]
                     if (!value) {
-                      formErrorsSeter.addErrors(i)
+                      formErrorsSeter.addErrors('form_ai_' + i)
                       callback(new Error("必填项"))
                     } else {
                       let validator: any = false
@@ -537,16 +556,16 @@ export default {
                         validator = this.renderArrFun(formItem.validator)(this.data, getData())
                       }
                       if (validator) {
-                        formErrorsSeter.addErrors(i)
+                        formErrorsSeter.addErrors('form_ai_' + i)
                         callback(new Error(validator))
                       }
                       else {
-                        formErrorsSeter.delErrors(i)
+                        formErrorsSeter.delErrors('form_ai_' + i)
                       }
                     }
                   }
                 }] : []} label={item.name}>
-                  {this.getFormNode(item, row, getData, formErrorsSeter)}
+                  {form.show === row.id ? this.getFormNode(item, row, getData, formErrorsSeter) : ''}
                 </el-form-item>)
               })
             }
@@ -561,7 +580,6 @@ export default {
     },
     getFormNode(item: FormData, row: any, getData: any, formErrorsSeter: {
       addErrors: (key?: any) => any
-      getErrors: (key: any) => any
       delErrors: (key: any) => void
     }) {
       if (!item.values) {
@@ -692,7 +710,7 @@ export default {
                     item.errors[row.id] = formErrorsSeter.addErrors()
                   }
                   else {
-                    formErrorsSeter.addErrors(item.errors[row.id])
+                    item.errors[row.id] = formErrorsSeter.addErrors(item.errors[row.id])
                   }
                 }
                 else {
@@ -703,6 +721,33 @@ export default {
               }
             }}
           ></CodeEditor>)
+        }
+        case "jsonInput": {
+          return (<JsonInputVue
+            modelValue={item.values[row.id]}
+            rows={item.rows || 5}
+            hideSub={true}
+            onChange={(e, error) => {
+              if (item.values) {
+                item.values[row.id] = e.value
+              }
+              if (item.errors) {
+                if (error.value) {
+                  if (!item.errors[row.id]) {
+                    item.errors[row.id] = formErrorsSeter.addErrors()
+                  }
+                  else {
+                    item.errors[row.id] = formErrorsSeter.addErrors(item.errors[row.id])
+                  }
+                }
+                else {
+                  if (item.errors[row.id]) {
+                    formErrorsSeter.delErrors(item.errors[row.id])
+                  }
+                }
+              }
+            }}
+          ></JsonInputVue>)
         }
       }
       return (<div></div>)

@@ -15,6 +15,12 @@ const data: TableData = {
       value: ""
     },
     {
+      name: '推送Id',
+      key: 'cid',
+      type: "input",
+      value: ""
+    },
+    {
       name: '微信Id',
       key: 'unionid',
       type: "input",
@@ -360,7 +366,7 @@ const data: TableData = {
         {
           type: "dialogForm",
           form: {
-            type: "info",
+            type: "primary",
             title: "推送",
             unflash: true,
             successMsg: "推送成功",
@@ -398,7 +404,7 @@ const data: TableData = {
               {
                 name: "启动参数",
                 key: "payload",
-                type: "json",
+                type: "jsonInput",
                 getValue() {
                   return {
                     "page": "跳转页面",
