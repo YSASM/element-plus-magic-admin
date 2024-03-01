@@ -14,6 +14,7 @@
  import RoutesLayout from "@/layout/RoutesLayout.vue"
  import TopLayout from "@/layout/TopLayout.vue"
  import router from "@/router"
+import utils from "@/utils"
  export default {
     data() {
        return {
@@ -22,7 +23,7 @@
        }
     },
     setup() {
-       const routeNow = location.pathname
+       const routeNow = utils.getPathName()
        return {
           routeNow
        }
@@ -33,7 +34,8 @@
     },
     created() {
        router.afterEach(() => {
-          this.routeNow = location.pathname
+         console.log(location)
+          this.routeNow = utils.getPathName()
           this.reload()
        })
     },

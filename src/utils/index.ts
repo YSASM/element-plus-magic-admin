@@ -84,5 +84,8 @@ export default {
     }
     const value = JSON.parse(s, rev)
     return value
+  },
+  getPathName(){
+    return location.hash.replace(/#/g,"")
   }
 }
