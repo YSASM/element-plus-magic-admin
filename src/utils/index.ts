@@ -88,7 +88,10 @@ export default {
   getPathName(){
     return location.hash.replace(/#/g,"")
   },
-  hmTsTos(ts:number){
+  hmTsTos(ts:number|string){
+    if (typeof ts == "string"){
+      ts = new Date(ts).getTime()
+    }
     return (ts/1000).toFixed()
   },
 }

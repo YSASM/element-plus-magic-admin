@@ -53,7 +53,7 @@ const data: TableData = {
         { key: "username", name: "操作人", align: "center", width: "100px", },
         { key: "method", name: "请求方法", align: "center", width: "100px", },
         { key: "path", name: "请求路径", align: "center", width: "300px", },
-        { key: "request", name: "请求参数", align: "center", width: "400px", },
+        { key: "request", name: "请求参数", align: "center", width: "400px", showJson:"request"},
         { key: "response", name: "返回参数", align: "center", width: "400px", },
     ],
 }

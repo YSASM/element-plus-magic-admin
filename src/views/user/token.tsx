@@ -15,7 +15,8 @@ const data: TableData = {
         {
             name: "ID",
             key: "id",
-            showJson: "*"
+            showJson: "*",
+            width:"100px"
         },
         {
             name: "用户ID",
@@ -24,35 +25,43 @@ const data: TableData = {
         },
         {
             name: "平台",
-            key: "platform"
+            key: "platform",
+            width:"100px"
         },
         {
             name: "版本",
-            key: "version"
+            key: "version",
+            width:"100px"
         },
         {
             name: "设备",
-            key: "device"
+            key: "device",
+            width:"200px"
         },
         {
             name: "token",
-            key: "token"
+            key: "token",
+            width:"300px"
         },
         {
             name: "访问次数",
-            key: "count"
+            key: "count",
+            width:"100px"
         },
         {
             name: "创建时间",
-            key: "create_time"
+            key: "create_time",
+            width:"200px"
         },
         {
             name: "最后访问时间",
-            key: "last_time"
+            key: "last_time",
+            width:"200px"
         },
         {
             name: "超时时间",
-            key: "expire_time"
+            key: "expire_time",
+            width:"200px"
         },
         {
             key: "table_tools",
@@ -61,6 +70,7 @@ const data: TableData = {
                 {
                     type: "dialogForm",
                     form: {
+                        primary:"id",
                         title: "token更新",
                         data: [
                             {
@@ -70,8 +80,19 @@ const data: TableData = {
                             }
                         ],
                         subFun(self, data) {
+                            console.log(data.expire_time)
                             data.expire_time = self.methods?.utils?.hmTsTos(data.expire_time)
-                            return self.api?.apiTest(data)
+                            return self.api?.updateToken(data)
+                        },
+                    }
+                },
+                {
+                    type: "popoverConfirm",
+                    confirm: {
+                        primary: "id",
+                        title: "删除",
+                        subFun(self, data) {
+                            return self.api?.delToken(data)
                         },
                     }
                 }

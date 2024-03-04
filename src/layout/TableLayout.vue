@@ -574,7 +574,7 @@ export default {
             }
           </el-form>
         </el-dialog >
-        <el-button disabled={disable} type={type} onClick={() => {
+        <el-button size="small" disabled={disable} type={type} onClick={() => {
           form.show = row.id
           this.$forceUpdate()
         }}>{rowTitle && form.key ? row[form.key] : form.title}</el-button>
@@ -849,7 +849,7 @@ export default {
             default: () => { return tableData.show == row.id ? <TableLayout reWriteTableData={renderRow} tableDataPath={tableData.path}></TableLayout> : "" }
           }}
         ></el-dialog>
-        <el-button disabled={disable} type={buttonType} onClick={() => {
+        <el-button size="small" disabled={disable} type={buttonType} onClick={() => {
           tableData.show = row.id
           this.$forceUpdate()
         }}>{rowTitle && tableData.key ? row[tableData.key] : tableData.title}</el-button>
@@ -889,7 +889,7 @@ export default {
       }
       return (<el-popover trigger="click" placement="bottom" width={160} v-slots={{
         reference: () => {
-          return (<el-button disabled={confirm.disable} type={buttonType}>{confirm.title}</el-button>)
+          return (<el-button size="small" disabled={confirm.disable} type={buttonType}>{confirm.title}</el-button>)
         }
       }}>
         <p>{confirm.confirmContent || "确认要删除吗"}</p>

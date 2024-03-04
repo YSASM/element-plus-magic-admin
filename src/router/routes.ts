@@ -127,7 +127,7 @@ const routes: Array<RouteRecordRaw> = [
         component: TableLayout,
         meta: {
           title: '操作日志',
-          icon: 'Filter',
+          icon: 'SetUp',
         },
       }
     ]

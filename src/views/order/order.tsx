@@ -3,7 +3,7 @@ import utils from "@/utils"
 const data: TableData = {
     fetchFun: (self, data) => {
         return new Promise((resolve) => {
-            self.api?.getBillList(data).then((res: any) => {
+            self.api?.getOrderList(data).then((res: any) => {
                 const tf = res.data.total_amount
                 for (const i in res.data.items) {
                     if (res.data.items[i].sign_id < 0) {
@@ -199,8 +199,36 @@ const data: TableData = {
             value: ''
         },
         {
+            name: "开票状态",
+            type: "select",
+            key: "invoice_status",
+            items: [
+                {
+                    name: "所有状态",
+                    key: ""
+                },
+                {
+                    name: "未开票",
+                    key: "1"
+                },
+                {
+                    name: "开票中",
+                    key: "2"
+                },
+                {
+                    name: "加急开票",
+                    key: "3"
+                },
+                {
+                    name: "开篇完成",
+                    key: "4"
+                }
+            ],
+            value: ""
+        },
+        {
             name: '时间',
-            key:"time",
+            key: "time",
             startKey: 'start_time',
             endKey: 'end_time',
             type: "datetimerange",
@@ -208,9 +236,9 @@ const data: TableData = {
         },
     ],
     tableColumns: [
-        { field: "id", key: "id", name: "ID", align: "center", width: "80px", sort: "", fixed: "left", },
+        { key: "id", name: "ID", align: "center", width: "80px", sort: "", fixed: "left", showJson: "*" },
         {
-            field: "user_id", key: "user_id", name: "用户ID", align: "center", width: "80px", editor: {
+            key: "user_id", name: "用户ID", align: "center", width: "80px", editor: {
                 type: "dialogTable",
                 tableData: {
                     type: "text",
@@ -234,13 +262,13 @@ const data: TableData = {
                 }
             }
         },
-        { field: "create_time", key: "create_time", name: "创建时间", align: "center", width: "180px", sort: "desc" },
-        { field: "user_name", key: "user_name", name: "用户名", align: "center", width: "80px", },
-        { field: "goods_id", key: "goods_id", name: "商品ID", align: "center", width: "80px" },
-        { field: "goods_name", key: "goods_name", name: "商品名", align: "center", width: "80px" },
-        { field: "goods_source", key: "goods_source", name: "商品来源", align: "center", width: "80px" },
-        { field: "out_trade_no", key: "out_trade_no", name: "订单号", align: "center", width: "250px", },
-        { field: "total_fee", key: "total_fee", name: "付款金额", align: "center", width: "80px", endStr: '元' },
+        { key: "create_time", name: "创建时间", align: "center", width: "180px", sort: "desc" },
+        { key: "user_name", name: "用户名", align: "center", width: "80px", },
+        { key: "goods_id", name: "商品ID", align: "center", width: "80px" },
+        { key: "goods_name", name: "商品名", align: "center", width: "80px" },
+        { key: "goods_source", name: "商品来源", align: "center", width: "80px" },
+        { key: "out_trade_no", name: "订单号", align: "center", width: "250px", },
+        { key: "total_fee", name: "付款金额", align: "center", width: "80px", endStr: '元' },
         {
             field: "pay_type", key: "pay_type", name: "支付方式", align: "center", width: "100px", showTag: {
                 "微信": {
@@ -254,7 +282,7 @@ const data: TableData = {
             }
         },
         {
-            field: "sign_type", key: "sign_type", name: "签约", align: "center", width: "100px", showTag: {
+            key: "sign_type", name: "签约", align: "center", width: "100px", showTag: {
                 "-1": {
                     type: 'danger',
                     content: '已解约'
@@ -269,11 +297,11 @@ const data: TableData = {
                 }
             }
         },
-        { field: "pay_channel", key: "pay_channel", name: "支付渠道", align: "center", width: "80px" },
-        { field: "user_source", key: "user_source", name: "推广来源", align: "center", width: "80px" },
-        { field: "platform", key: "platform", name: "平台", align: "center", width: "80px" },
-        { field: "channel", key: "channel", name: "用户渠道", align: "center", width: "100px" },
-        { field: "version", key: "version", name: "用户版本", align: "center", width: "80px" },
+        { key: "pay_channel", name: "支付渠道", align: "center", width: "80px" },
+        { key: "user_source", name: "推广来源", align: "center", width: "80px" },
+        { key: "platform", name: "平台", align: "center", width: "80px" },
+        { key: "channel", name: "用户渠道", align: "center", width: "100px" },
+        { key: "version", name: "用户版本", align: "center", width: "80px" },
         {
             field: "status", key: "status", name: "订单状态", align: "center", width: "80px", showTag: {
                 "1": {
@@ -298,7 +326,64 @@ const data: TableData = {
                 },
             }
         },
-        { field: "pay_time", key: "pay_time", name: "支付时间", align: "center", width: "180px", sort: "" },
+        {
+            key: "invoice_status", name: "开票状态", align: "center", width: "100px", showTag: {
+                "0": {
+                    type: 'info',
+                    content: '未开票'
+                },
+                "1": {
+                    type: 'info',
+                    content: '未开票'
+                },
+                "2": {
+                    type: 'warning',
+                    content: '开票中'
+                },
+                "3": {
+                    type: 'danger',
+                    content: '加急开票'
+                },
+                "4": {
+                    type: 'success',
+                    content: '开票完成'
+                }
+            }
+        },
+        { key: "invoice_params", name: "开票参数", align: "center", width: "180px", },
+        { key: "invoice_url", name: "开票链接", align: "center", width: "180px", editor:{
+            type:"dialogForm",
+            form:{
+                key:"invoice_url",
+                type:"text",
+                title:"开票",
+                primary:"id",
+                getDisable(self, row) {
+                    if(row.invoice_status=="2" || row.invoice_status=="3"){
+                        return false
+                    }
+                    return true
+                },
+                data:[
+                    {
+                        type:'none',
+                        key:"invoice_status",
+                        getValue() {
+                            return "4"
+                        },
+                    },
+                    {
+                        type:"input",
+                        name:"开票链接",
+                        key:"invoice_url"
+                    }
+                ],
+                subFun(self, data) {
+                    return self.api?.updateOrder(data)
+                },
+            }
+        }},
+        { key: "pay_time", name: "支付时间", align: "center", width: "180px", sort: "" },
     ]
 }
 
