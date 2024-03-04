@@ -68,6 +68,7 @@ const data: TableData = {
                 },
             }
         },
+        { key: "push_rsp", name: "推送结果", align: "center", width: "200px", showJson: "push_rsp" },
         { key: "create_time", name: "创建时间", align: "center", width: "200px", sort: "" },
         { key: "update_time", name: "更新时间", align: "center", width: "200px", sort: "" },
         {

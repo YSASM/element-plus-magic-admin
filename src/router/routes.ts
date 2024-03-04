@@ -115,6 +115,24 @@ const routes: Array<RouteRecordRaw> = [
     ]
   },
   {
+    path: '/system',
+    meta: {
+      title: '系统管理',
+      icon: 'Setting',
+    },
+    component: MainLayout,
+    children: [
+      {
+        path: "log",
+        component: TableLayout,
+        meta: {
+          title: '操作日志',
+          icon: 'Filter',
+        },
+      }
+    ]
+  },
+  {
     meta: {
       title: '提示词管理',
       icon: 'ChatSquare',
