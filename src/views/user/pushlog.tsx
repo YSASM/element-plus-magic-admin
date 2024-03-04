@@ -61,9 +61,9 @@ const data: TableData = {
         { key: "title", name: "标题", align: "center", width: "100px", },
         { key: "message", name: "正文", align: "center", width: "180px", },
         { key: "intent", name: "启动页面", align: "center", width: "100px", },
-        { key: "payload", name: "启动参数", align: "center", width: "180px", showJson: "payload" },
+        { key: "payload", name: "启动参数", align: "center", width: "100px", showJson: "payload" },
         {
-            key: "status", name: "状态", align: "center", width: "100px", showTag: {
+            key: "status", name: "状态", align: "center", width: "80px", showTag: {
                 "已发送": {
                     type: 'success',
                     content: '已发送'
@@ -78,7 +78,7 @@ const data: TableData = {
                 },
             }
         },
-        { key: "push_rsp", name: "推送结果", align: "center", width: "200px", showJson: "push_rsp" },
+        { key: "push_rsp", name: "推送结果", align: "center", width: "100px", showJson: "push_rsp" },
         { key: "create_time", name: "创建时间", align: "center", width: "200px", sort: "" },
         { key: "update_time", name: "更新时间", align: "center", width: "200px", sort: "" },
         {
