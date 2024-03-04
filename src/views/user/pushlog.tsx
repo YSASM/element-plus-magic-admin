@@ -12,6 +12,16 @@ const data: TableData = {
             type: "input",
         },
         {
+            name: '手机品牌',
+            key: 'brand',
+            type: "input",
+        },
+        {
+            name: '手机型号',
+            key: 'model',
+            type: "input",
+        },
+        {
             name: "状态",
             key: "status",
             type: "select",
