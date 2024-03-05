@@ -26,7 +26,7 @@
 
 <script lang="tsx">
 import CodeEditor from "@/components/CodeEditor.vue"
-import type { TableData, TableColumn, Form, FormData, Fliter, Confirm } from "@/type/TableData"
+import type { TableData, TableColumn, Form, FormData, Fliter, Confirm , OnlyFun } from "@/type/TableData"
 import ElementRender from "./ElementRender"
 import JsonViewer from "@/components/JsonViewer.vue"
 import { useRouter } from "vue-router"
@@ -816,6 +816,17 @@ export default {
             buttons.push(<div style="margin: 0 5px auto auto;">{this.createTable(button.tableData, row)}</div>)
           }
         }
+        else if (button.type == "onlyFun"){
+          if (button.onlyFun) {
+            if (this.tableDataPath) {
+              button.onlyFun.disable = true
+            }
+            else {
+              button.onlyFun.disable = undefined
+            }
+            buttons.push(<div style="margin: 0 5px auto auto;">{this.createOnlyFun(button.onlyFun, row)}</div>)
+          }
+        }
       }
       // return <div class="flex-row" style="justify-content: space-between;">{buttons}</div>
       return (<el-popover trigger="click" popper-class="popper-auto-width" placement="top" width={160} v-slots={{
@@ -872,6 +883,23 @@ export default {
           this.$forceUpdate()
         }}>{rowTitle && tableData.key ? row[tableData.key] : tableData.title}</el-button>
       </div>)
+    },
+    createOnlyFun(onlyFun:OnlyFun,row:any, rowTitle: boolean = false) {
+      let disable: any = onlyFun.disable
+      if (onlyFun.getDisable) {
+        disable = this.renderArrFun(onlyFun.getDisable)(this.data, row)
+      }
+      let buttonType: any = "success"
+      if (onlyFun.type) {
+        if (typeof onlyFun.type == "function" || typeof onlyFun.type == "object") {
+          buttonType = this.renderArrFun(onlyFun.type)(this.data, row)
+        } else {
+          buttonType = onlyFun.type
+        }
+      }
+      return(<el-button size="small" disabled={disable} type={buttonType} onClick={() => {
+          this.renderArrFun(onlyFun.fun)(this.data)
+        }}>{rowTitle && onlyFun.key ? row[onlyFun.key] : onlyFun.title}</el-button>)
     },
     createConfirm(confirm: Confirm, row: any) {
       if (confirm.getDisable) {
@@ -1128,6 +1156,9 @@ export default {
               }
               else if (item.editor.type == "dialogTable" && item.editor.tableData) {
                 element = this.getPoint(this.createTable(item.editor.tableData, props.row, true))
+              }
+              else if (item.editor.type == "onlyFun" && item.editor.onlyFun){
+                element = this.getPoint(this.createOnlyFun(item.editor.onlyFun, props.row, true))
               }
             }
             return element

@@ -95,13 +95,29 @@ export interface Methods {
     [prop: string]: any
 }
 
+export interface OnlyFun {
+    key?:string
+    disable?: boolean
+    getDisable?: ((self: TableData, row: {
+        [prop: string]: any
+    }) => boolean) | Array<string>
+    title: string
+    type?: "" | "primary" | "success" | "info" | "danger" | "warning" | ((self: TableData, row: {
+        [prop: string]: any
+    }) => any)
+    fun:((self: TableData, row: {
+        [prop: string]: any
+    }) => void) | Array<string>
+}
+
 export interface TableColumn {
     [prop: string]: any
     hide?: boolean
     key: "table_tools" | string
     name: string
     buttons?: Array<{
-        type: "dialogForm" | "popoverConfirm" | "dialogTable"
+        type: "dialogForm" | "popoverConfirm" | "dialogTable" | "onlyFun"
+        onlyFun?:OnlyFun
         hide?: boolean
         createTable?: ((self: TableData, row: {
             [prop: string]: any
@@ -131,7 +147,8 @@ export interface TableColumn {
     showJson?: string
     showOverflow?: string
     editor?: {
-        type: "json" | "select" | "switch" | "input" | "dialogForm" | "dialogTable"
+        type: "json" | "select" | "switch" | "input" | "dialogForm" | "dialogTable" | "onlyFun"
+        onlyFun?:OnlyFun
         createForm?: ((self: TableData, row: {
             [prop: string]: any
         }) => Form) | Array<string>
