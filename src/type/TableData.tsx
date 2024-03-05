@@ -101,10 +101,10 @@ export interface OnlyFun {
     getDisable?: ((self: TableData, row: {
         [prop: string]: any
     }) => boolean) | Array<string>
-    title: string
-    type?: "" | "primary" | "success" | "info" | "danger" | "warning" | ((self: TableData, row: {
+    title?: string
+    type?: "" | "primary" | "success" | "info" | "danger" | "warning" | "text" | ((self: TableData, row: {
         [prop: string]: any
-    }) => any)
+    }) => any) | Array<string>
     fun:((self: TableData, row: {
         [prop: string]: any
     }) => void) | Array<string>
