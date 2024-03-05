@@ -1,4 +1,5 @@
 import type { TableData } from "@/type/TableData"
+import utils from "@/utils"
 const data: TableData = {
     fetchFun(self, data) {
         self.showText = "基础表格演示"
@@ -52,7 +53,15 @@ const data: TableData = {
                 ]
             },
             value: ""
-        }
+        },
+        {
+            name: '时间',
+            key:"time",
+            startKey: 'start_time',
+            endKey: 'end_time',
+            type: "datetimerange",
+            value: utils.defaultDate()
+        },
     ],
     tableColumns: [
         { key: "id", name: "ID", width: "200px", showJson: "*" },

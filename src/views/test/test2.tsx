@@ -39,7 +39,11 @@ const data: TableData = {
                             {
                                 key: "test_select2",
                                 value: "2"
-                            }
+                            },
+                            {
+                                key: "time",
+                                value: [1709615081000,1709615090000]
+                            },
                         ]
                     }
                 }
