@@ -902,11 +902,9 @@ export default {
         }}>{rowTitle && onlyFun.key ? row[onlyFun.key] : onlyFun.title}</el-button>)
     },
     createConfirm(confirm: Confirm, row: any) {
+      let disable: any = confirm.disable
       if (confirm.getDisable) {
-        let disable = this.renderArrFun(confirm.getDisable)(this.data, row)
-        if (confirm.disable != disable) {
-          confirm.disable = disable
-        }
+        disable = this.renderArrFun(confirm.getDisable)(this.data, row)
       }
 
       let buttonType: any = "danger"
@@ -935,7 +933,7 @@ export default {
       }
       return (<el-popover trigger="click" placement="bottom" width={160} v-slots={{
         reference: () => {
-          return (<el-button size="small" disabled={confirm.disable} type={buttonType}>{confirm.title}</el-button>)
+          return (<el-button size="small" disabled={disable} type={buttonType}>{confirm.title}</el-button>)
         }
       }}>
         <p>{confirm.confirmContent || "确认要删除吗"}</p>
