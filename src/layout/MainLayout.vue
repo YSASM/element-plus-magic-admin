@@ -1,7 +1,7 @@
 <template>
    <div class="main flex-row">
       <div class="left-routes">
-         <RoutesLayout :routeNow="routeNow" @reload="reload"></RoutesLayout>
+         <RoutesLayout :routeNow="routeNow"></RoutesLayout>
       </div>
       <div class="right-content flex-col">
          <TopLayout class="top-bar"></TopLayout>
@@ -9,11 +9,13 @@
       </div>
    </div>
 </template>
- 
+
 <script lang="ts">
 import RoutesLayout from "@/layout/RoutesLayout.vue"
 import TopLayout from "@/layout/TopLayout.vue"
 import utils from "@/utils"
+import { watch } from "vue"
+import { useRouter } from "vue-router"
 
 export default {
    data() {
@@ -34,33 +36,27 @@ export default {
       TopLayout
    },
    created() {
-
+      const router = useRouter()
+      watch(
+         () => router.currentRoute.value,
+         (newValue: any) => {
+            this.routeNow = newValue.fullPath
+            this.reload()
+         },
+         { immediate: true }
+      )
    },
    methods: {
-      // getHidden() {
-      //    const router = useRouter()
-      //    console.log(router.currentRoute.value)
-      //    return router.currentRoute.value.meta.hidden === true
-      // },
       reload() {
-         clearInterval(this.timer)
-         this.timer = null
-         this.timer = setInterval(() => {
-            if (this.routeNow != utils.getPathName()) {
-               this.routeNow = utils.getPathName()
-               clearInterval(this.timer)
-               this.timer = null
-               this.isReloading = true
-               this.$nextTick(() => [
-                  this.isReloading = false
-               ])
-            }
-         }, 100)
+         this.isReloading = true
+         this.$nextTick(() => [
+            this.isReloading = false
+         ])
       }
    }
 }
 </script>
- 
+
 <style lang="scss" scoped>
 .main {
    width: 100vw;
