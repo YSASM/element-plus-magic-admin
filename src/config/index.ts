@@ -1,28 +1,10 @@
 const config: any = {
     baseUrlList: [
-        {
-            name: '招标快报',
-            url: '/bid',
-            appid: "10020"
-        },
-        {
-            name: '桃李教资',
-            url: '/jzapi',
-            appid: "10027"
-        }, {
-            name: '快存图',
-            url: '/kctapi',
-            appid: "10024"
-        }, {
-            name: 'MBTI',
-            url: '/mbtiapi',
-            appid: "10029"
-        }
-        , {
-            name: '极光写作',
-            url: '/jgapi',
-            appid: "10030"
-        }
+        // {
+        //     name: '应用名',
+        //     url: '/test',
+        //     appid: "000"
+        // },
     ],
     //消息框消失时间
     messageDuration: 3000,

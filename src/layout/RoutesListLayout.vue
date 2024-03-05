@@ -58,6 +58,7 @@ export default {
 </script>
 <style lang="scss">
 .routes-list {
+    user-select: none;
     list-style-type: none;
     padding: 0;
 

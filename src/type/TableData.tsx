@@ -9,7 +9,10 @@ export interface FormData {
         key: string
         [prop: string]: any
     }>,
-    getItems?: (((self: TableData) => Promise<any>)) | Array<string>
+    getItems?: (((self: TableData) => Array<{
+        key: any
+        name: string
+    }>)) | Array<string>
     form?: Form
     emptyLabel?: string
     opt?: any
@@ -145,6 +148,10 @@ export interface TableColumn {
             key: string
             [prop: string]: any
         }>,
+        getItems?: (((self: TableData) => Array<{
+            key: any
+            name: string
+        }>)) | Array<string>
         emptyLabel?: string
         editoring?: string | boolean
         beforeShow?: ((data: TableColumn) => void) | Array<string>
@@ -168,6 +175,10 @@ export interface Fliter {
         key: string
         [prop: string]: any
     }>,
+    getItems?: (((self: TableData) => Array<{
+        key: any
+        name: string
+    }>)) | Array<string>
     createForm?: ((self: TableData) => Form) | Array<string>
     form?: Form
     emptyLabel?: string
@@ -187,6 +198,7 @@ export interface Fliter {
 
 export interface TableData {
     [prop: string]: any
+    key?:string
     showText?: string
     show?: boolean
     title?: string
@@ -198,7 +210,7 @@ export interface TableData {
     getDisable?: ((self: TableData, row: {
         [prop: string]: any
     }) => boolean) | Array<string>
-    launchTask?: (Array<(self: TableData) => Promise<any>>) | Array<string>
+    launchTask?: (Array<(self: TableData) => Promise<any>>) | Array<Array<string>>
     bean?: {
         [prop: string]: any,
     }
@@ -234,6 +246,6 @@ export interface TableData {
     fetchFun?: ((self: TableData, data: { [prop: string]: any }) => Promise<any>) | Array<string>
     fetchDataitems?: any
     tableColumns?: Array<TableColumn> | null
-    addNods?: Array<JSX.Element>
+    addNods?: Array<(self: TableData) => JSX.Element>
     renderRow?: TableData
 }

@@ -20,7 +20,7 @@
         加载中
       </div> -->
     </div>
-    <ElementRender :vNode="item ? item : ''" v-for="item, index in data.addNods" :key="index"></ElementRender>
+    <ElementRender :vNode="item ? item(data) : ''" v-for="item, index in data.addNods" :key="index"></ElementRender>
   </div>
 </template>
 
@@ -36,7 +36,7 @@ import message from "@/utils/message"
 import utils from "@/utils"
 import TableLayout from "./TableLayout.vue"
 import JsonInputVue from "@/components/JsonInput.vue"
-import { ref } from "vue"
+import { reactive, ref } from "vue"
 export default {
   props: {
     tableDataPath: {
@@ -78,12 +78,16 @@ export default {
     const data_temp: any = await this.tableDataModule();
     const data: TableData = utils.deepClone(data_temp.default)
     this.data = data;
+    if (!this.data) {
+      console.error("data未加载成功:" + this.tableDataFilePath)
+      return
+    }
     if (this.apiModule) {
       const api_temp: any = await this.apiModule()
       this.data.api = api_temp.default ? api_temp.default : undefined
     }
     if (!this.data.api) {
-      console.log("未找到API文件或未加载成功:" + this.apiFilePath)
+      console.error("未找到API文件或未加载成功:" + this.apiFilePath)
       this.data.api = {
         apiTest: this.apiTest
       }
@@ -92,7 +96,15 @@ export default {
     }
 
     if (!this.data.methods) {
-      this.data.methods = {}
+      this.data.methods = reactive({})
+    }
+
+    if (!this.data.bean) {
+      this.data.bean = reactive({})
+    }
+
+    if (!this.data.addNods){
+      this.data.addNods = reactive([])
     }
 
     this.data.methods.getNode = this.getNode
@@ -347,6 +359,12 @@ export default {
             type={item.rows ? 'textarea' : ''} rows={item.rows ? item.rows : null} placeholder={item.emptyLabel}></el-input>)
         }
         case "select": {
+          if (!item.items && item.getItems) {
+            item.items = this.renderArrFun(item.getItems)(this.data)
+            if(item.items && item.items.length>0 && item.items[0].key===""){
+              item.emptyLabel = item.items[0].name
+            }
+          }
           return (<el-select modelValue={item.value} placeholder={item.emptyLabel} filterable={item.filterable}
             onChange={(e: any) => {
               item.value = e
@@ -503,7 +521,7 @@ export default {
             if (form.show) {
               form.show = false
             }
-            for (let i in errors){
+            for (let i in errors) {
               errors[i] = false
             }
           }}
@@ -617,11 +635,11 @@ export default {
           ></el-input>)
         }
         case "select": {
-          if (!item.items || item.getItems) {
-            this.renderArrFun(item.getItems)(this.data).then((res: any) => {
-              item.items = res
-            })
-            return ""
+          if (!item.items && item.getItems) {
+            item.items = this.renderArrFun(item.getItems)(this.data)
+            if(item.items && item.items.length>0 && item.items[0].key===""){
+              item.emptyLabel = item.items[0].name
+            }
           }
           return (<el-select disabled={item.disable} modelValue={item.values[row.id]} placeholder={item.emptyLabel} filterable={item.filterable}
             onChange={(e: any) => {
@@ -921,15 +939,19 @@ export default {
         sort-orders={['ascending', 'descending', '']}
         v-slots={{
           default: (props: any) => {
-            if (Object.keys(props.row).length <= 1) {
-              return
+            if (item.key == "table_tools") {
+              return this.getTableButtons(item, props.row)
+            }
+            if(typeof props.row[item.key] == "object"){
+              try{
+                props.row[item.key] = JSON.stringify(props.row[item.key])
+              }catch(e){
+                console.warn(e)
+              }
             }
             if (!props.row.id) {
               props.row.id = index
               index += 1
-            }
-            if (item.key == "table_tools") {
-              return this.getTableButtons(item, props.row)
             }
             let element = item.renderBodyCell ? this.renderArrFun(item.renderBodyCell)({
               row: props.row,
@@ -1056,6 +1078,12 @@ export default {
               else if (item.editor.type == "select") {
                 if (!item.editor.emptyLabel && item.editor.items && item.editor.items[0].key == "") {
                   item.editor.emptyLabel = item.editor.items[0].name
+                }
+                if (!item.editor.items && item.editor.getItems) {
+                  item.editor.items = this.renderArrFun(item.editor.getItems)(this.data)
+                  if(item.editor.items && item.editor.items.length>0 && item.editor.items[0].key===""){
+                    item.editor.emptyLabel = item.editor.items[0].name
+                  }
                 }
                 element = (<el-select size="small" modelValue={props.row[item.key]} placeholder={item.editor.emptyLabel}
                   onChange={(e: any) => {

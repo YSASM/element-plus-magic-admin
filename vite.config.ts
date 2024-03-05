@@ -33,34 +33,14 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
-    port: 4000,
-    open: true,
-    proxy: {
-      '/bid': {
-        target: 'http://bid3.batiao8.com',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/bid/, ''),
-      },
-      '/jzapi': {
-        target: 'http://jz.batiao8.com',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/jzapi/, ''),
-      },
-      '/kctapi': {
-        target: 'http://kct3.batiao8.com',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/kctapi/, ''),
-      },
-      '/mbtiapi': {
-        target: 'http://192.168.2.16:9269',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/mbtiapi/, ''),
-      },
-      '/jgapi': {
-        target: 'http://aiw.batiao8.com',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/jgapi/, ''),
-      },
-    }
+    port: 3200,
+    open: true
+    // proxy: {
+    //   '/test': {
+    //     target: 'http://test.com',
+    //     changeOrigin: true,
+    //     rewrite: (path) => path.replace(/^\/test/, ''),
+    //   }
+    // }
   }
 })

@@ -10,10 +10,11 @@
                 <label class="input-label">密码</label>
                 <ElInput class="input" v-model="password" type="password" show-password></ElInput>
             </div>
-            <div class="input-box flex-row">
+            <div class="input-box flex-row" v-if="baseUrlList && baseUrlList.length > 0">
                 <label class="input-label">产品</label>
                 <ElSelect placeholder="请选择要登陆的产品" class="input" v-model="baseUrl" type="password" show-password>
-                    <ElOption v-for="item in baseUrlList" :key="item.url" :label="item.name" :value="item.url"></ElOption>
+                    <ElOption v-for="item in baseUrlList" :key="item.url" :label="item.name" :value="item.url">
+                    </ElOption>
                 </ElSelect>
             </div>
             <ElButton type="primary" class="login" @click="login">登录</ElButton>
@@ -37,7 +38,7 @@ export default {
     },
     created() {
         const store = indexStore();
-        this.baseUrl = store.$state.baseUrl;
+        this.baseUrl = store.$state.baseUrl || "/api";
     },
     methods: {
         getLoginItem() {
@@ -69,17 +70,24 @@ export default {
             store.$patch({
                 baseUrl: this.baseUrl
             });
-            const item: any = this.getLoginItem()
-            loginApi.login({
+            const data:any = {
                 username: this.username,
                 password: this.password,
-                appid: item.appid
-            }).then((res) => {
-                store.$patch({
-                    token:res.data.token,
-                    username:res.data.username,
-                    title:item.name
-                })
+            }
+            let item:any
+            if (this.baseUrlList && this.baseUrlList.length > 0) {
+                item = this.getLoginItem()
+                data.appid = item.appid
+            }
+            loginApi.login(data).then((res) => {
+                const patchdata:any = {
+                    token: res.data.token,
+                    username: res.data.username,
+                }
+                if (item){
+                    patchdata.title = item.name
+                }
+                store.$patch(patchdata)
                 message.success("登录成功")
                 this.$router.push("/")
             })
@@ -96,9 +104,10 @@ export default {
     background-size: 100% 100%;
 
     .login-box {
-        height: 400px;
+        // height: 400px;
         width: 400px;
         // border: solid;
+        padding-bottom: 30px;
         background-color: #fff;
         margin: auto;
         border-radius: 10px;
