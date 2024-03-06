@@ -3,6 +3,7 @@ export interface FormData {
     hide?: boolean
     name?: string
     key: string
+    unsub?:boolean
     rows?: number
     items?: Array<{
         name: string
@@ -12,35 +13,39 @@ export interface FormData {
     getItems?: (((self: TableData) => Array<{
         key: any
         name: string
-    }>)) | Array<string>
+    }>))
     form?: Form
     emptyLabel?: string
     opt?: any
     getValue?: (((self: TableData, row: {
         [prop: string]: any
-    }) => any)) | Array<string>
+    }) => any))
+    onChange?: (self: TableData,form:Form,formData:FormData,row_id:any)=>void
     openValue?: any
     closeValue?: any
     openStr?: string
     closeStr?: string
     disableLabel?: boolean
     [prop: string]: any
+    values?:{
+        [prop: string]: any
+    }
     type: "input" | "select" | "cascader" | "datetimerange" | "switch" | "datetime" | "json" | "jsonInput" | "none"
     disable?: boolean
     getDisable?: ((self: TableData, data: {
         [prop: string]: any
-    }) => boolean) | Array<string>
+    }) => boolean)
     must?: boolean
     validator?: ((self: TableData, data: {
         [prop: string]: any
-    }) => string) | Array<string>
+    }) => string)
 }
 
 export interface Form {
     primary?: string
     type?: "" | "primary" | "success" | "info" | "danger" | "warning" | "text" | ((self: TableData, row: {
         [prop: string]: any
-    }) => any) | Array<string>
+    }) => any)
     [prop: string]: any
     key?: string
     disable?: boolean
@@ -48,18 +53,18 @@ export interface Form {
     successMsg?: string
     getDisable?: ((self: TableData, row: {
         [prop: string]: any
-    }) => boolean) | Array<string>
+    }) => boolean)
     title?: string
     data: Array<FormData>,
     show?: any
-    subFun: ((self: TableData, data: { [prop: string]: any }) => Promise<any>) | Array<string>
+    subFun: ((self: TableData, data: { [prop: string]: any }) => Promise<any>)
 }
 export interface Confirm {
     [prop: string]: any
     disable?: boolean
     getDisable?: ((self: TableData, row: {
         [prop: string]: any
-    }) => boolean) | Array<string>
+    }) => boolean)
     primary: string
     title: string
     confirmContent?: string
@@ -78,12 +83,14 @@ export interface Confirm {
         }) => any)
         text?: string
     }
-    subFun: ((self: TableData, data: { [prop: string]: any }) => Promise<any>) | Array<string>
+    subFun: ((self: TableData, data: { [prop: string]: any }) => Promise<any>)
 }
 export interface Methods {
     getNode?: (item: any) => JSX.Element
     fetchData?: () => void
     getSort?: (sortItem: any) => string
+    getPoint?:(str:string) => JSX.Element
+    getEditor?:(str:string) => JSX.Element
     message?: {
         success: (msg: string) => void
         warning: (msg: string) => void
@@ -100,14 +107,14 @@ export interface OnlyFun {
     disable?: boolean
     getDisable?: ((self: TableData, row: {
         [prop: string]: any
-    }) => boolean) | Array<string>
+    }) => boolean)
     title?: string
     type?: "" | "primary" | "success" | "info" | "danger" | "warning" | "text" | ((self: TableData, row: {
         [prop: string]: any
-    }) => any) | Array<string>
+    }) => any)
     fun:((self: TableData, row: {
         [prop: string]: any
-    }) => void) | Array<string>
+    }) => void)
 }
 
 export interface TableColumn {
@@ -121,15 +128,15 @@ export interface TableColumn {
         hide?: boolean
         createTable?: ((self: TableData, row: {
             [prop: string]: any
-        }) => TableData) | Array<string>
+        }) => TableData)
         tableData?: TableData
         createForm?: ((self: TableData, row: {
             [prop: string]: any
-        }) => Form) | Array<string>
+        }) => Form)
         form?: Form
         createConfirm?: ((self: TableData, row: {
             [prop: string]: any
-        }) => Confirm) | Array<string>
+        }) => Confirm)
         confirm?: Confirm
     }>
     width?: "auto" | number | string
@@ -151,11 +158,11 @@ export interface TableColumn {
         onlyFun?:OnlyFun
         createForm?: ((self: TableData, row: {
             [prop: string]: any
-        }) => Form) | Array<string>
+        }) => Form)
         form?: Form
         createTable?: ((self: TableData, row: {
             [prop: string]: any
-        }) => TableData) | Array<string>
+        }) => TableData)
         tableData?: TableData
         primary?: string
         openValue?: any
@@ -168,13 +175,13 @@ export interface TableColumn {
         getItems?: (((self: TableData) => Array<{
             key: any
             name: string
-        }>)) | Array<string>
+        }>))
         emptyLabel?: string
         editoring?: string | boolean
-        beforeShow?: ((data: TableColumn) => void) | Array<string>
-        subFun?: ((self: TableData, data: { [prop: string]: any }) => Promise<any>) | Array<string>
+        beforeShow?: ((data: TableColumn) => void)
+        subFun?: ((self: TableData, data: { [prop: string]: any }) => Promise<any>)
     }
-    renderBodyCell?: ((data: { row: any, column: any, rowIndex: any, self: TableColumn }) => any) | Array<string | JSX.Element>
+    renderBodyCell?: ((data: { row: any, column: any, rowIndex: any, self: TableData }) => any)
     node?: JSX.Element
 }
 
@@ -195,8 +202,8 @@ export interface Fliter {
     getItems?: (((self: TableData) => Array<{
         key: any
         name: string
-    }>)) | Array<string>
-    createForm?: ((self: TableData) => Form) | Array<string>
+    }>))
+    createForm?: ((self: TableData) => Form)
     form?: Form
     emptyLabel?: string
     opt?: any
@@ -226,7 +233,7 @@ export interface TableData {
     disable?: boolean
     getDisable?: ((self: TableData, row: {
         [prop: string]: any
-    }) => boolean) | Array<string>
+    }) => boolean)
     launchTask?: (Array<(self: TableData) => Promise<any>>) | Array<Array<string>>
     bean?: {
         [prop: string]: any,
@@ -259,8 +266,8 @@ export interface TableData {
     total?: any
     sizeOption?: Array<number>
     fliter?: Array<Fliter>
-    beforeFetch?: ((self: TableData, fliter: { [prop: string]: any }) => void) | Array<string>
-    fetchFun?: ((self: TableData, data: { [prop: string]: any }) => Promise<any>) | Array<string>
+    beforeFetch?: ((self: TableData, fliter: { [prop: string]: any }) => void)
+    fetchFun?: ((self: TableData, data: { [prop: string]: any }) => Promise<any>)
     fetchDataitems?: any
     tableColumns?: Array<TableColumn> | null
     addNods?: Array<(self: TableData) => JSX.Element>

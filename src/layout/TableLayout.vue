@@ -108,6 +108,8 @@ export default {
     }
 
     this.data.methods.getNode = this.getNode
+    this.data.methods.getPoint = this.getPoint
+    this.data.methods.getEditor = this.getEditor
     this.data.methods.fetchData = this.fetchData
     this.data.methods.getSort = this.getSort
     this.data.methods.message = message
@@ -116,8 +118,8 @@ export default {
     this.formatData()
 
     for (let i in this.data.launchTask) {
-      const task = this.data.launchTask[Number(i)]
-      await this.renderArrFun(task)(this.data)
+      const task:any = this.data.launchTask[Number(i)]
+      await task(this.data)
     }
     if (!this.tableDataPath) {
       document.onkeyup = (e) => {
@@ -161,47 +163,6 @@ export default {
         }
       }
     },
-    renderArrFun(f: any) {
-      if (typeof f == "function") {
-        return f
-      }
-      if (typeof f != "object") {
-        return () => { return f }
-      }
-      if (!f[0] || f[0] !== "[FUNC]" || f.length < 3) {
-        console.error("arr fun 不完整")
-        return () => { return null }
-      }
-      try {
-        let value = utils.deepClone(f)
-        let args = value[1]
-        args = args.substr(1, args.length - 2).split(":")[1].split(",")
-        value.splice(0, 2)
-        let return_value = value[value.length - 1]
-        return_value = return_value.substr(1, return_value.length - 2).split(":")[1]
-        value.splice(value.length - 1, 1)
-        let fun = (...vars: any[]) => {
-          if (vars.length !== args.length) {
-            console.error("参数个数错误")
-            return
-          }
-          let names: any = {}
-          for (let i = 0; i < vars.length; i++) {
-            names[args[i]] = i.toString()
-          }
-          for (let i = 0; i < value.length; i++) {
-            if (typeof value[i] == "string") {
-              eval(value[i])
-            }
-          }
-          return vars[return_value]
-        }
-        return fun
-      } catch (e) {
-        console.error(e)
-      }
-      return () => { return null }
-    },
     getCircularReplacer() {
       const seen = new WeakSet();
       return (key: any, value: any) => {
@@ -225,7 +186,7 @@ export default {
         data = this.data
       }
       data.fliter?.forEach((item: any) => {
-        if (item.items && item.items[0].key == "") {
+        if (item.items && item.items.length > 0 && item.items[0].key == "") {
           item.emptyLabel = item.items[0].name
         }
         if (item.value === undefined) {
@@ -360,7 +321,7 @@ export default {
         }
         case "select": {
           if (!item.items && item.getItems) {
-            item.items = this.renderArrFun(item.getItems)(this.data)
+            item.items = item.getItems(this.data)
             if(item.items && item.items.length>0 && item.items[0].key===""){
               item.emptyLabel = item.items[0].name
             }
@@ -378,6 +339,12 @@ export default {
           </el-select>)
         }
         case "cascader": {
+          if (!item.items && item.getItems) {
+            item.items = item.getItems(this.data)
+            if(item.items && item.items.length>0 && item.items[0].key===""){
+              item.emptyLabel = item.items[0].name
+            }
+          }
           return (<el-cascader modelValue={item.value} placeholder={item.emptyLabel} options={item.items} onChange={(e: any) => {
             item.value = e
             this.fetchData()
@@ -433,7 +400,7 @@ export default {
         }
         case "dialogForm": {
           if (item.createForm) {
-            item.form = this.renderArrFun(item.createForm)(this.data)
+            item.form = item.createForm(this.data)
           }
           if (item.form) {
             if (!item.form.show) {
@@ -450,21 +417,24 @@ export default {
     },
     createForm(form: Form, row: any, rowTitle: boolean = false) {
       let type: any = ""
-      let disable = form.disable
+      let disable:any = form.disable
       if (disable === undefined && form.getDisable) {
-        disable = this.renderArrFun(form.getDisable)(this.data, row)
+        disable = form.getDisable(this.data, row)
       }
       if (typeof form.type == "function" || typeof form.type == "object") {
-        type = this.renderArrFun(form.type)(this.data, row)
+        type = form.type(this.data, row)
       } else {
         type = form.type
       }
       form.data?.forEach((item) => {
         item.values = {}
       })
-      function getData() {
+      function getData(unsub?:boolean) {
         let data: any = {}
         form.data?.forEach((item) => {
+          if(item.unsub&&unsub){
+            return
+          }
           if (item.key && item.values) {
             data[item.key] = item.values[row.id] || ""
           }
@@ -529,12 +499,12 @@ export default {
           v-slots={{
             footer: () => {
               return (<div class="dialog-footer">
-                <el-button onClick={() => {
+                <el-button size="small" onClick={() => {
                   form.show = false
                   this.$forceUpdate()
                 }}>取消</el-button>
-                <el-button type="primary" disabled={formCan_tSub.value} onClick={() => {
-                  this.formSub(form, getData())
+                <el-button size="small" type="primary" disabled={formCan_tSub.value} onClick={() => {
+                  this.formSub(form, getData(true))
                 }}>
                   确认
                 </el-button>
@@ -542,7 +512,7 @@ export default {
             }
           }}
         >
-          <el-form label-width="auto">
+          <el-form label-width="auto" size="small">
             {
               form.data?.map((item, i) => {
                 if (item.hide) {
@@ -555,7 +525,7 @@ export default {
                     if (!value) {
                       formErrorsSeter.addErrors('form_ai_' + i)
                     } else {
-                      if (formItem.validator && this.renderArrFun(formItem.validator)(this.data, getData())) {
+                      if (formItem.validator && formItem.validator(this.data, getData())) {
                         formErrorsSeter.addErrors('form_ai_' + i)
                       }
                       else {
@@ -574,7 +544,7 @@ export default {
                     } else {
                       let validator: any = false
                       if (formItem.validator) {
-                        validator = this.renderArrFun(formItem.validator)(this.data, getData())
+                        validator = formItem.validator(this.data, getData())
                       }
                       if (validator) {
                         formErrorsSeter.addErrors('form_ai_' + i)
@@ -586,7 +556,7 @@ export default {
                     }
                   }
                 }] : []} label={item.name}>
-                  {form.show === row.id ? this.getFormNode(item, row, getData, formErrorsSeter) : ''}
+                  {form.show === row.id ? this.getFormNode(form,item, row, getData, formErrorsSeter) : ''}
                 </el-form-item>)
               })
             }
@@ -599,7 +569,7 @@ export default {
       </div >
       )
     },
-    getFormNode(item: FormData, row: any, getData: any, formErrorsSeter: {
+    getFormNode(form:Form,item: FormData, row: any, getData: any, formErrorsSeter: {
       addErrors: (key?: any) => any
       delErrors: (key: any) => void
     }) {
@@ -611,7 +581,7 @@ export default {
       }
       if (item.values[row.id] === undefined) {
         if (item.getValue) {
-          item.values[row.id] = this.renderArrFun(item.getValue)(this.data, row)
+          item.values[row.id] = item.getValue(this.data, row)
         }
         else {
           if (item.key) {
@@ -620,7 +590,7 @@ export default {
         }
       }
       if (item.getDisable) {
-        let disable = this.renderArrFun(item.getDisable)(this.data, getData())
+        let disable = item.getDisable(this.data, getData())
         if (item.disable != disable) {
           item.disable = disable
         }
@@ -636,7 +606,7 @@ export default {
         }
         case "select": {
           if (!item.items && item.getItems) {
-            item.items = this.renderArrFun(item.getItems)(this.data)
+            item.items = item.getItems(this.data)
             if(item.items && item.items.length>0 && item.items[0].key===""){
               item.emptyLabel = item.items[0].name
             }
@@ -645,6 +615,9 @@ export default {
             onChange={(e: any) => {
               if (item.values) {
                 item.values[row.id] = e
+              }
+              if(item.onChange){
+                item.onChange(this.data,form,item,row.id)
               }
             }}>
             {
@@ -655,6 +628,12 @@ export default {
           </el-select>)
         }
         case "cascader": {
+          if (!item.items && item.getItems) {
+            item.items = item.getItems(this.data)
+            if(item.items && item.items.length>0 && item.items[0].key===""){
+              item.emptyLabel = item.items[0].name
+            }
+          }
           return (<el-cascader disabled={item.disable} modelValue={item.values[row.id]} placeholder={item.emptyLabel} options={item.items} props={{
             value: 'key',
             label: 'name',
@@ -664,6 +643,9 @@ export default {
           }} show-all-levels={false} filterable={item.filterable} onChange={(e: any) => {
             if (item.values) {
               item.values[row.id] = e
+            }
+            if(item.onChange){
+              item.onChange(this.data,form,item,row.id)
             }
           }}>
           </el-cascader>)
@@ -709,6 +691,9 @@ export default {
           return (<el-switch disabled={item.disable} modelValue={item.values[row.id]} onChange={(e: any) => {
             if (item.values) {
               item.values[row.id] = e
+            }
+            if(item.onChange){
+              item.onChange(this.data,form,item,row.id)
             }
           }} active-value={item.openValue}
             inactive-value={item.closeValue}>
@@ -784,7 +769,7 @@ export default {
         }
         if (button.type == "dialogForm") {
           if (!button.form && button.createForm) {
-            button.form = this.renderArrFun(button.createForm)(this.data, row)
+            button.form = button.createForm(this.data, row)
           }
           if (button.form) {
             if (button.form.show === undefined) {
@@ -795,7 +780,7 @@ export default {
         }
         else if (button.type == "popoverConfirm") {
           if (!button.confirm && button.createConfirm) {
-            button.confirm = this.renderArrFun(button.createConfirm)(this.data, row)
+            button.confirm = button.createConfirm(this.data, row)
           }
 
           if (button.confirm) {
@@ -804,7 +789,7 @@ export default {
         }
         else if (button.type == "dialogTable") {
           if (!button.tableData && button.createTable) {
-            button.tableData = this.renderArrFun(button.createTable)(this.data, row)
+            button.tableData = button.createTable(this.data, row)
           }
           if (button.tableData) {
             if (this.tableDataPath) {
@@ -843,12 +828,12 @@ export default {
     createTable(tableData: TableData, row: any, rowTitle: boolean = false) {
       let disable: any = tableData.disable
       if (tableData.getDisable) {
-        disable = this.renderArrFun(tableData.getDisable)(this.data, row)
+        disable = tableData.getDisable(this.data, row)
       }
       let buttonType: any = "success"
       if (tableData.type) {
         if (typeof tableData.type == "function" || typeof tableData.type == "object") {
-          buttonType = this.renderArrFun(tableData.type)(this.data, row)
+          buttonType = tableData.type(this.data, row)
         } else {
           buttonType = tableData.type
         }
@@ -887,24 +872,24 @@ export default {
     createOnlyFun(onlyFun:OnlyFun,row:any, rowTitle: boolean = false) {
       let disable: any = onlyFun.disable
       if (onlyFun.getDisable) {
-        disable = this.renderArrFun(onlyFun.getDisable)(this.data, row)
+        disable = onlyFun.getDisable(this.data, row)
       }
       let buttonType: any = "success"
       if (onlyFun.type) {
         if (typeof onlyFun.type == "function" || typeof onlyFun.type == "object") {
-          buttonType = this.renderArrFun(onlyFun.type)(this.data, row)
+          buttonType = onlyFun.type(this.data, row)
         } else {
           buttonType = onlyFun.type
         }
       }
       return(<el-button size="small" disabled={disable} type={buttonType} onClick={() => {
-          this.renderArrFun(onlyFun.fun)(this.data)
+          onlyFun.fun(this.data,row)
         }}>{rowTitle && onlyFun.key ? row[onlyFun.key] : onlyFun.title}</el-button>)
     },
     createConfirm(confirm: Confirm, row: any) {
       let disable: any = confirm.disable
       if (confirm.getDisable) {
-        disable = this.renderArrFun(confirm.getDisable)(this.data, row)
+        disable = confirm.getDisable(this.data, row)
       }
 
       let buttonType: any = "danger"
@@ -912,21 +897,21 @@ export default {
       let cancelButtonType: any = ""
       if (confirm.type) {
         if (typeof confirm.type == "function" || typeof confirm.type == "object") {
-          buttonType = this.renderArrFun(confirm.type)(this.data, row)
+          buttonType = confirm.type(this.data, row)
         } else {
           buttonType = confirm.type
         }
       }
       if (confirm.confirmButton && confirm.confirmButton.type) {
         if (typeof confirm.confirmButton.type == "function" || typeof confirm.confirmButton.type == "object") {
-          confirmButtonType = this.renderArrFun(confirm.confirmButton.type)(this.data, row)
+          confirmButtonType = confirm.confirmButton.type(this.data, row)
         } else {
           confirmButtonType = confirm.confirmButton.type
         }
       }
       if (confirm.cancelButton && confirm.cancelButton.type) {
         if (typeof confirm.cancelButton.type == "function" || typeof confirm.cancelButton.type == "object") {
-          cancelButtonType = this.renderArrFun(confirm.cancelButton.type)(this.data, row)
+          cancelButtonType = confirm.cancelButton.type(this.data, row)
         } else {
           cancelButtonType = confirm.cancelButton.type
         }
@@ -979,11 +964,11 @@ export default {
               props.row.id = index
               index += 1
             }
-            let element = item.renderBodyCell ? this.renderArrFun(item.renderBodyCell)({
+            let element = item.renderBodyCell ? item.renderBodyCell({
               row: props.row,
               column: props.column,
               rowIndex: props.cellIndex,
-              self: item
+              self: this.data
             }) : item.html ? (<div v-html={props.row[item.key] || ""}></div>) : <div>{props.row[item.key] || ""}</div>
             if (item.showTag && !item.editor) {
               let tag = item.showTag[props.row[item.key]]
@@ -1106,7 +1091,7 @@ export default {
                   item.editor.emptyLabel = item.editor.items[0].name
                 }
                 if (!item.editor.items && item.editor.getItems) {
-                  item.editor.items = this.renderArrFun(item.editor.getItems)(this.data)
+                  item.editor.items = item.editor.getItems(this.data)
                   if(item.editor.items && item.editor.items.length>0 && item.editor.items[0].key===""){
                     item.editor.emptyLabel = item.editor.items[0].name
                   }
@@ -1168,7 +1153,7 @@ export default {
         return
       }
       item.show = false
-      const back = this.renderArrFun(item.subFun)(this.data, data)
+      const back = item.subFun(this.data, data)
       back && back.then(() => {
         message.success(item.successMsg || "操作成功")
         if (item.unflash) {
@@ -1181,7 +1166,7 @@ export default {
       if (!item.editor || !item.editor.subFun) {
         return
       }
-      const back = this.renderArrFun(item.editor.subFun)(this.data, data)
+      const back = item.editor.subFun(this.data, data)
       back && back.then(() => {
         message.success("操作成功")
         this.fetchData()
@@ -1212,7 +1197,7 @@ export default {
         this.data.ready = true
         return
       }
-      this.renderArrFun(this.data.fetchFun)(this.data, fliter).then((res: any) => {
+      this.data.fetchFun(this.data, fliter).then((res: any) => {
         this.data.fetchDataitems = res.data.items
         this.data.total = res.data.total
         this.data.ready = true
