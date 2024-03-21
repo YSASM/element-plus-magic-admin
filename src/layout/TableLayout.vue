@@ -197,6 +197,10 @@ export default {
         if (item.items && item.items.length > 0 && item.items[0].key == "") {
           item.emptyLabel = item.items[0].name
         }
+        if (item.value === undefined && item.getValue) {
+          item.value = item.getValue(this.data)
+        }
+        console.log(item.value)
         if (item.value === undefined) {
           item.value = ""
         }
@@ -318,10 +322,6 @@ export default {
       }
     },
     getFliterNode(item: Fliter) {
-      if (!item.value && item.getValue) {
-        item.value = item.getValue(this.data)
-        delete item.getValue
-      }
       switch (item.type) {
         case "input": {
           return (<el-input vModel_trim={item.value} clearable={true} onKeyup={(e: any) => {
