@@ -1,9 +1,8 @@
 import type { TableData } from "@/type/TableData"
-import utils from "@/utils"
 const data: TableData = {
     fetchFun(self, data) {
         self.showText = "基础表格演示"
-        return self.api?.test1GetList(data)
+        return self.api?.test1GetList(data)//self.api?.test1GetList是在src/api目录下的同名文件，会自动引入
     },
     fliter: [
         {
@@ -56,12 +55,24 @@ const data: TableData = {
         },
         {
             name: '时间',
-            key:"time",
+            key: "time",
             startKey: 'start_time',
             endKey: 'end_time',
             type: "datetimerange",
-            value: utils.defaultDate()
+            getValue(self) {
+                console.log(self.methods)
+                return self.methods?.utils?.defaultDate() //self.methods?.utils为src/utils/index中的所有函数
+            },
         },
+        {
+            type: "onlyFun",
+            onlyFun: {
+                title: "查看api",
+                fun(self) {
+                    console.log(self.api)
+                },
+            }
+        }
     ],
     tableColumns: [
         { key: "id", name: "ID", width: "200px", showJson: "*" },
@@ -81,13 +92,13 @@ const data: TableData = {
                         }
                     ],
                     subFun(self, data) {
-                        return self.api?.apiTest(data)
+                        return self.api?.apiTest(data)// self.api?.apiTest是固定有的，在TableLayout里写入的，用于测试api，将传入内容打印到控制台
                     },
                 }
             }
         },
         {
-            key: "content", name: "正文", width: "200px", editor: {
+            key: "content", name: "正文", editor: {
                 type: "input",
                 subFun(self, data) {
                     return self.api?.apiTest(data)
@@ -100,7 +111,7 @@ const data: TableData = {
                 openValue: "1",
                 closeValue: "2",
                 subFun(self, data) {
-                    return self.api?.apiTest(data)
+                    return self.api?.apiTest(data)// self.api?.apiTest是固定有的，在TableLayout里写入的，用于测试api，将传入内容打印到控制台
                 },
             }
         },
@@ -108,7 +119,7 @@ const data: TableData = {
             key: "config", name: "配置", width: "400px", editor: {
                 type: "json",
                 subFun(self, data) {
-                    return self.api?.apiTest(data)
+                    return self.api?.apiTest(data)// self.api?.apiTest是固定有的，在TableLayout里写入的，用于测试api，将传入内容打印到控制台
                 },
             }
         },
@@ -136,8 +147,8 @@ const data: TableData = {
                                 key: "num",
                                 name: "只能输入数字",
                                 type: "input",
-                                must:true,
-                                validator(self,data) {
+                                must: true,
+                                validator(self, data) {
                                     const value = data.num
                                     if (!self.methods?.utils?.isNumber(value)) {
                                         return "不是数字"
@@ -157,18 +168,18 @@ const data: TableData = {
                             }
                         ],
                         subFun(self, data) {
-                            return self.api?.apiTest(data)
+                            return self.api?.apiTest(data)// self.api?.apiTest是固定有的，在TableLayout里写入的，用于测试api，将传入内容打印到控制台
                         },
                     }
                 },
                 {
-                    type:"popoverConfirm",
-                    confirm:{
-                        primary:"id",
-                        title:"删除",
-                        confirmContent:"删除测试",
+                    type: "popoverConfirm",
+                    confirm: {
+                        primary: "id",
+                        title: "删除",
+                        confirmContent: "删除测试",
                         subFun(self, data) {
-                            return self.api?.apiTest(data)
+                            return self.api?.apiTest(data)// self.api?.apiTest是固定有的，在TableLayout里写入的，用于测试api，将传入内容打印到控制台
                         },
                     }
                 }

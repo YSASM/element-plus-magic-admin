@@ -1,7 +1,6 @@
-
 <template>
   <div v-if="!loding" class="page">
-    <div v-loading="!data.ready || loding" class="fliter-box flex-row">
+    <div v-loading="!data.ready" class="fliter-box flex-row">
       <!-- eslint-disable-next-line vue/no-deprecated-v-on-native-modifier -->
       <el-form @submit.native.prevent :inline="true" size="small" label-width="auto" style="margin-top: auto;">
         <el-form-item v-show="item.type && !item.hide" v-for="item, index in data.fliter" :key="'fliter_' + index"
@@ -13,7 +12,7 @@
         </el-form-item>
       </el-form>
     </div>
-    <div class="content-box flex-col" v-loading="!data.ready || loding" element-loading-text="Loading...">
+    <div class="content-box flex-col" v-loading="!data.ready" element-loading-text="Loading...">
       <TableElement v-if="data.ready" :data="data">
       </TableElement>
       <!-- <div v-else style="margin: auto;">
@@ -26,7 +25,7 @@
 
 <script lang="tsx">
 import CodeEditor from "@/components/CodeEditor.vue"
-import type { TableData, TableColumn, Form, FormData, Fliter, Confirm , OnlyFun } from "@/type/TableData"
+import type { TableData, TableColumn, Form, FormData, Fliter, Confirm, OnlyFun } from "@/type/TableData"
 import ElementRender from "./ElementRender"
 import JsonViewer from "@/components/JsonViewer.vue"
 import { useRouter } from "vue-router"
@@ -71,71 +70,80 @@ export default {
     };
   },
   async created() {
-    if (!this.tableDataModule) {
-      console.error("未找到表格文件:" + this.tableDataFilePath)
-      return
-    }
-    const data_temp: any = await this.tableDataModule();
-    const data: TableData = utils.deepClone(data_temp.default)
-    this.data = data;
-    if (!this.data) {
-      console.error("data未加载成功:" + this.tableDataFilePath)
-      return
-    }
-    if (this.apiModule) {
-      const api_temp: any = await this.apiModule()
-      this.data.api = api_temp.default ? api_temp.default : undefined
-    }
-    if (!this.data.api) {
-      console.error("未找到API文件或未加载成功:" + this.apiFilePath)
-      this.data.api = {
-        apiTest: this.apiTest
+    try {
+      if (!this.tableDataModule) {
+        console.error("未找到表格文件:" + this.tableDataFilePath)
+        return
       }
-    } else {
-      this.data.api.apiTest = this.apiTest
-    }
+      const data_temp: any = await this.tableDataModule();
+      const data: TableData = utils.deepClone(data_temp.default)
+      this.data = data;
+      if (!this.data) {
+        console.error("data未加载成功:" + this.tableDataFilePath)
+        return
+      }
+      if (this.apiModule) {
+        const api_temp: any = await this.apiModule()
+        this.data.api = api_temp.default ? api_temp.default : undefined
+      }
+      if (!this.data.api) {
+        console.error("未找到API文件或未加载成功:" + this.apiFilePath)
+        this.data.api = {
+          apiTest: this.apiTest
+        }
+      } else {
+        this.data.api.apiTest = this.apiTest
+      }
 
-    if (!this.data.methods) {
-      this.data.methods = reactive({})
-    }
+      if (!this.data.methods) {
+        this.data.methods = reactive({})
+      }
 
-    if (!this.data.bean) {
-      this.data.bean = reactive({})
-    }
+      if (!this.data.bean) {
+        this.data.bean = reactive({})
+      }
 
-    if (!this.data.addNods){
-      this.data.addNods = reactive([])
-    }
+      if (!this.data.addNods) {
+        this.data.addNods = reactive([])
+      }
 
-    this.data.methods.getNode = this.getNode
-    this.data.methods.getPoint = this.getPoint
-    this.data.methods.getEditor = this.getEditor
-    this.data.methods.fetchData = this.fetchData
-    this.data.methods.getSort = this.getSort
-    this.data.methods.message = message
-    this.data.methods.utils = utils
+      this.data.methods.getNode = this.getNode
+      this.data.methods.getPoint = this.getPoint
+      this.data.methods.getEditor = this.getEditor
+      this.data.methods.fetchData = this.fetchData
+      this.data.methods.getSort = this.getSort
+      this.data.methods.message = message
+      this.data.methods.utils = utils
 
-    this.formatData()
+      this.formatData()
 
-    for (let i in this.data.launchTask) {
-      const task:any = this.data.launchTask[Number(i)]
-      await task(this.data)
-    }
-    if (!this.tableDataPath) {
-      document.onkeyup = (e) => {
-        if (e.key == "Escape") {
-          this.$el.click()
+      for (let i in this.data.launchTask) {
+        const task: any = this.data.launchTask[Number(i)]
+        await task(this.data)
+      }
+      if (!this.tableDataPath) {
+        document.onkeyup = (e) => {
+          if (e.key == "Escape") {
+            this.$el.click()
+          }
         }
       }
+      this.renderRewriteTableData()
+      this.loding = false
+    } catch (e: any) {
+      this.loding = false
+      if (/error loading dynamically imported module/.test(e.message)) {
+        location.reload();
+      }
+      console.error(e)
+      return
     }
-    this.renderRewriteTableData()
-    this.loding = false
+
     this.fetchData()
   },
   unmounted() {
     this.loding = true
     this.data = {}
-
   },
   methods: {
     renderRewriteTableData(reWriteTableData: any = null) {
@@ -218,7 +226,7 @@ export default {
         if (item.hide) {
           return
         }
-        if (!item.width) {
+        if (!item.width && item.key == "table_tools") {
           item.width = "100%"
         }
         if (item.sort && item.sort !== "none") {
@@ -310,6 +318,10 @@ export default {
       }
     },
     getFliterNode(item: Fliter) {
+      if (!item.value && item.getValue) {
+        item.value = item.getValue(this.data)
+        delete item.getValue
+      }
       switch (item.type) {
         case "input": {
           return (<el-input vModel_trim={item.value} clearable={true} onKeyup={(e: any) => {
@@ -322,7 +334,7 @@ export default {
         case "select": {
           if (!item.items && item.getItems) {
             item.items = item.getItems(this.data)
-            if(item.items && item.items.length>0 && item.items[0].key===""){
+            if (item.items && item.items.length > 0 && item.items[0].key === "") {
               item.emptyLabel = item.items[0].name
             }
           }
@@ -341,7 +353,7 @@ export default {
         case "cascader": {
           if (!item.items && item.getItems) {
             item.items = item.getItems(this.data)
-            if(item.items && item.items.length>0 && item.items[0].key===""){
+            if (item.items && item.items.length > 0 && item.items[0].key === "") {
               item.emptyLabel = item.items[0].name
             }
           }
@@ -411,13 +423,40 @@ export default {
               id: "form"
             })
           }
+          break
+        }
+        // else if (item.editor.type == "dialogTable" && item.editor.tableData) {
+        //   element = this.getPoint(this.createTable(item.editor.tableData, props.row, true))
+        // }
+        // else if (item.editor.type == "onlyFun" && item.editor.onlyFun) {
+        //   element = this.getPoint(this.createOnlyFun(item.editor.onlyFun, props.row, true))
+        // }
+        case "dialogTable": {
+          if (item.createTable) {
+            item.tableData = item.createTable(this.data)
+
+          }
+          if (item.tableData) {
+            return this.createTable(item.tableData, {
+              id: "table"
+            })
+          }
+          break
+        }
+        case "onlyFun": {
+          if (item.onlyFun) {
+            return this.createOnlyFun(item.onlyFun, {
+              id: "onlyFun"
+            })
+          }
         }
       }
+
       return (<div></div>)
     },
     createForm(form: Form, row: any, rowTitle: boolean = false) {
       let type: any = ""
-      let disable:any = form.disable
+      let disable: any = form.disable
       if (disable === undefined && form.getDisable) {
         disable = form.getDisable(this.data, row)
       }
@@ -429,10 +468,10 @@ export default {
       form.data?.forEach((item) => {
         item.values = {}
       })
-      function getData(unsub?:boolean) {
+      function getData(unsub?: boolean) {
         let data: any = {}
         form.data?.forEach((item) => {
-          if(item.unsub&&unsub){
+          if (item.unsub && unsub) {
             return
           }
           if (item.key && item.values) {
@@ -556,7 +595,7 @@ export default {
                     }
                   }
                 }] : []} label={item.name}>
-                  {form.show === row.id ? this.getFormNode(form,item, row, getData, formErrorsSeter) : ''}
+                  {form.show === row.id ? this.getFormNode(form, item, row, getData, formErrorsSeter) : ''}
                 </el-form-item>)
               })
             }
@@ -569,7 +608,7 @@ export default {
       </div >
       )
     },
-    getFormNode(form:Form,item: FormData, row: any, getData: any, formErrorsSeter: {
+    getFormNode(form: Form, item: FormData, row: any, getData: any, formErrorsSeter: {
       addErrors: (key?: any) => any
       delErrors: (key: any) => void
     }) {
@@ -607,7 +646,7 @@ export default {
         case "select": {
           if (!item.items && item.getItems) {
             item.items = item.getItems(this.data)
-            if(item.items && item.items.length>0 && item.items[0].key===""){
+            if (item.items && item.items.length > 0 && item.items[0].key === "") {
               item.emptyLabel = item.items[0].name
             }
           }
@@ -616,8 +655,8 @@ export default {
               if (item.values) {
                 item.values[row.id] = e
               }
-              if(item.onChange){
-                item.onChange(this.data,form,item,row.id)
+              if (item.onChange) {
+                item.onChange(this.data, form, item, row.id)
               }
             }}>
             {
@@ -630,7 +669,7 @@ export default {
         case "cascader": {
           if (!item.items && item.getItems) {
             item.items = item.getItems(this.data)
-            if(item.items && item.items.length>0 && item.items[0].key===""){
+            if (item.items && item.items.length > 0 && item.items[0].key === "") {
               item.emptyLabel = item.items[0].name
             }
           }
@@ -644,8 +683,8 @@ export default {
             if (item.values) {
               item.values[row.id] = e
             }
-            if(item.onChange){
-              item.onChange(this.data,form,item,row.id)
+            if (item.onChange) {
+              item.onChange(this.data, form, item, row.id)
             }
           }}>
           </el-cascader>)
@@ -683,7 +722,7 @@ export default {
           </el-date-picker>)
         }
         case "datetime": {
-          return (<el-date-picker disabled={item.disable} vModel_trim={item.values[row.id]} type="datetime" value-format="x"
+          return (<el-date-picker disabled={item.disable} vModel_trim={item.values[row.id]} type="datetime" value-format="x" style="width:100%"
             placeholder="选择日期">
           </el-date-picker>)
         }
@@ -692,8 +731,8 @@ export default {
             if (item.values) {
               item.values[row.id] = e
             }
-            if(item.onChange){
-              item.onChange(this.data,form,item,row.id)
+            if (item.onChange) {
+              item.onChange(this.data, form, item, row.id)
             }
           }} active-value={item.openValue}
             inactive-value={item.closeValue}>
@@ -801,7 +840,7 @@ export default {
             buttons.push(<div style="margin: 0 5px auto auto;">{this.createTable(button.tableData, row)}</div>)
           }
         }
-        else if (button.type == "onlyFun"){
+        else if (button.type == "onlyFun") {
           if (button.onlyFun) {
             if (this.tableDataPath) {
               button.onlyFun.disable = true
@@ -825,7 +864,7 @@ export default {
 
       </el-popover>)
     },
-    createTable(tableData: TableData, row: any, rowTitle: boolean = false) {
+    createTable(tableData: TableData, row: any = null, rowTitle: boolean = false) {
       let disable: any = tableData.disable
       if (tableData.getDisable) {
         disable = tableData.getDisable(this.data, row)
@@ -838,14 +877,17 @@ export default {
           buttonType = tableData.type
         }
       }
-      const renderRow = utils.deepClone(tableData.renderRow)
-      renderRow.fliter?.forEach((item: any) => {
-        if (typeof item.value == "object") {
-          if (row[item.value.row]) {
-            item.value = row[item.value.row]
+      let renderRow: any = null
+      if (tableData.renderRow) {
+        renderRow = utils.deepClone(tableData.renderRow)
+        renderRow.fliter?.forEach((item: any) => {
+          if (typeof item.value == "object") {
+            if (row[item.value.row]) {
+              item.value = row[item.value.row]
+            }
           }
-        }
-      })
+        })
+      }
       return (<div>
         <el-dialog
           class="dialog-table"
@@ -869,7 +911,7 @@ export default {
         }}>{rowTitle && tableData.key ? row[tableData.key] : tableData.title}</el-button>
       </div>)
     },
-    createOnlyFun(onlyFun:OnlyFun,row:any, rowTitle: boolean = false) {
+    createOnlyFun(onlyFun: OnlyFun, row: any, rowTitle: boolean = false) {
       let disable: any = onlyFun.disable
       if (onlyFun.getDisable) {
         disable = onlyFun.getDisable(this.data, row)
@@ -882,11 +924,11 @@ export default {
           buttonType = onlyFun.type
         }
       }
-      return(<el-button size="small" disabled={disable} type={buttonType} onClick={() => {
-          onlyFun.fun(this.data,row)
-        }}>{rowTitle && onlyFun.key ? row[onlyFun.key] : onlyFun.title}</el-button>)
+      return (<el-button size="small" disabled={disable} type={buttonType} onClick={() => {
+        onlyFun.fun(this.data, row)
+      }}>{rowTitle && onlyFun.key ? row[onlyFun.key] : onlyFun.title}</el-button>)
     },
-    createConfirm(confirm: Confirm, row: any) {
+    createConfirm(confirm: Confirm, row: any, rowTitle: boolean = false) {
       let disable: any = confirm.disable
       if (confirm.getDisable) {
         disable = confirm.getDisable(this.data, row)
@@ -918,7 +960,7 @@ export default {
       }
       return (<el-popover trigger="click" placement="bottom" width={160} v-slots={{
         reference: () => {
-          return (<el-button size="small" disabled={disable} type={buttonType}>{confirm.title}</el-button>)
+          return (<el-button size="small" disabled={disable} type={buttonType}>{rowTitle && confirm.key ? row[confirm.key] : confirm.title}</el-button>)
         }
       }}>
         <p>{confirm.confirmContent || "确认要删除吗"}</p>
@@ -938,9 +980,18 @@ export default {
       if (!data) {
         data = this.data
       }
+      if (item.key == "table_tools" && !item.fixed) {
+        item.fixed = "right"
+      }
+      if (item.buttons?.length === 1) {
+        item.editor = item.buttons[0]
+        delete item.buttons
+        item.key = "table_tools_butons_rewrite"
+        item.editor.hidePoint = true
+      }
       let index = 0
-      return (<el-table-column fixed={item.key == "table_tools" ? "right" : item.fixed}
-        show-overflow-tooltip={item.key !== "table_tools" && !item.showOverflow && !item.showJson && !item.editor}
+      return (<el-table-column fixed={item.fixed}
+        show-overflow-tooltip={!item.buttons && !item.showJson && !item.editor}
         width={item.width}
         align="center"
         column-key={item.key}
@@ -953,10 +1004,10 @@ export default {
             if (item.key == "table_tools") {
               return this.getTableButtons(item, props.row)
             }
-            if(typeof props.row[item.key] == "object"){
-              try{
+            if (typeof props.row[item.key] == "object") {
+              try {
                 props.row[item.key] = JSON.stringify(props.row[item.key])
-              }catch(e){
+              } catch (e) {
                 console.warn(e)
               }
             }
@@ -1092,7 +1143,7 @@ export default {
                 }
                 if (!item.editor.items && item.editor.getItems) {
                   item.editor.items = item.editor.getItems(this.data)
-                  if(item.editor.items && item.editor.items.length>0 && item.editor.items[0].key===""){
+                  if (item.editor.items && item.editor.items.length > 0 && item.editor.items[0].key === "") {
                     item.editor.emptyLabel = item.editor.items[0].name
                   }
                 }
@@ -1112,7 +1163,7 @@ export default {
                   }
                 </el-select>)
               }
-              else if (item.editor.type === "json") {
+              else if (item.editor.type === "html" || item.editor.type === "json") {
                 element = (<el-popover
                   placement="right"
                   width="820"
@@ -1120,6 +1171,7 @@ export default {
                   v-slots={{
                     reference: () => this.getPoint(props.row[item.key] || ""),
                     default: () => <CodeEditor
+                      language={item.editor ? item.editor.type : "json"}
                       modelValue={props.row[item.key]}
                       onChange={(e) => { props.row[item.key] = e }}
                       onSub={() => {
@@ -1134,14 +1186,44 @@ export default {
                 >
                 </el-popover>)
               }
-              else if (item.editor.type == "dialogForm" && item.editor.form) {
-                element = this.getPoint(this.createForm(item.editor.form, props.row, true))
+              else if (item.editor.type == "dialogForm") {
+                if (item.editor.createForm) {
+                  item.editor.form = item.editor.createForm(this.data, props.row)
+                }
+                if (item.editor.form) {
+                  element = this.createForm(item.editor.form, props.row, true)
+                  if (!item.editor.hidePoint) {
+                    element = this.getPoint(element)
+                  }
+                }
               }
-              else if (item.editor.type == "dialogTable" && item.editor.tableData) {
-                element = this.getPoint(this.createTable(item.editor.tableData, props.row, true))
+              else if (item.editor.type == "dialogTable") {
+                if (item.editor.createTable) {
+                  item.editor.tableData = item.editor.createTable(this.data, props.row)
+                }
+                if (item.editor.tableData) {
+                  element = this.createTable(item.editor.tableData, props.row, true)
+                  if (!item.editor.hidePoint) {
+                    element = this.getPoint(element)
+                  }
+                }
               }
-              else if (item.editor.type == "onlyFun" && item.editor.onlyFun){
-                element = this.getPoint(this.createOnlyFun(item.editor.onlyFun, props.row, true))
+              else if (item.editor.type == "popoverConfirm") {
+                if (item.editor.createConfirm) {
+                  item.editor.confirm = item.editor.createConfirm(this.data, props.row)
+                }
+                if (item.editor.confirm) {
+                  element = this.createConfirm(item.editor.confirm, props.row, true)
+                  if (!item.editor.hidePoint) {
+                    element = this.getPoint(element)
+                  }
+                }
+              }
+              else if (item.editor.type == "onlyFun" && item.editor.onlyFun) {
+                element = this.createOnlyFun(item.editor.onlyFun, props.row, true)
+                if (!item.editor.hidePoint) {
+                  element = this.getPoint(element)
+                }
               }
             }
             return element
@@ -1169,6 +1251,9 @@ export default {
       const back = item.editor.subFun(this.data, data)
       back && back.then(() => {
         message.success("操作成功")
+        if (item.unflash) {
+          return
+        }
         this.fetchData()
       })
     },

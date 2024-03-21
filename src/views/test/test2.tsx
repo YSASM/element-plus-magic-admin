@@ -13,7 +13,7 @@ const data: TableData = {
     ],
     tableColumns: [
         {
-            key: "id", name: "id", width: "1000px", editor: {
+            key: "id", name: "id", editor: {
                 type: "dialogTable",
                 tableData: {
                     type: "text",

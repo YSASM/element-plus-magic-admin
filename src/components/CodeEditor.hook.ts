@@ -1,15 +1,15 @@
 import * as monaco from 'monaco-editor'
 import { ref, nextTick, onBeforeUnmount } from 'vue'
- 
-export function useMonacoEditor(language: string = 'javascript') {
+
+export function useMonacoEditor(language: string = 'json') {
   // 编辑器示例
   let monacoEditor: monaco.editor.IStandaloneCodeEditor | null = null
   // 目标元素
   const monacoEditorRef = ref<HTMLElement | null>(null)
- 
+
   // 创建实例
   function createEditor(editorOption: monaco.editor.IStandaloneEditorConstructionOptions = {}) {
-    if(!monacoEditorRef.value) return
+    if (!monacoEditorRef.value) return
     monacoEditor = monaco.editor.create(monacoEditorRef.value, {
       // 初始模型
       model: monaco.editor.createModel('', language),
@@ -40,47 +40,53 @@ export function useMonacoEditor(language: string = 'javascript') {
     })
     return monacoEditor
   }
- 
+
   // 格式化
   async function formatDoc() {
     await monacoEditor?.getAction('editor.action.formatDocument')?.run()
   }
- 
+
   // 数据更新
   function updateVal(val: string) {
     nextTick(() => {
-      if(getOption(monaco.editor.EditorOption.readOnly)) {
+      if (getOption(monaco.editor.EditorOption.readOnly)) {
         updateOptions({ readOnly: false })
       }
       monacoEditor?.setValue(val)
-      setTimeout(async () => {
+      let count = 0
+      let timer:any = setInterval(async () => {
         await formatDoc()
+        count+=1
+        if(count>2){
+          clearInterval(timer)
+          timer = null
+        }
       }, 500)
     })
   }
- 
+
   // 配置更新
   function updateOptions(opt: monaco.editor.IStandaloneEditorConstructionOptions) {
     monacoEditor?.updateOptions(opt)
   }
- 
+
   // 获取配置
   function getOption(name: monaco.editor.EditorOption) {
     return monacoEditor?.getOption(name)
   }
- 
+
   // 获取实例
   function getEditor() {
     return monacoEditor
   }
- 
+
   // 页面离开 销毁
   onBeforeUnmount(() => {
-    if(monacoEditor) {
+    if (monacoEditor) {
       monacoEditor.dispose()
     }
   })
- 
+
   return {
     monacoEditorRef,
     createEditor,

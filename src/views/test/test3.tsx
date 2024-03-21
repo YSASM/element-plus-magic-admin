@@ -69,7 +69,7 @@ const data: TableData = {
     ],
     tableColumns: [
         {
-            key: "id", name: "id", width: "1000px", editor: {
+            key: "id", name: "id", editor: {
                 type: "onlyFun",
                 onlyFun: {
                     type: "text",
@@ -85,10 +85,10 @@ const data: TableData = {
                 {
                     type: "onlyFun",
                     onlyFun: {
-                        title:"alert",
+                        title: "alert",
                         type: "warning",
                         fun: (self) => {
-                            alert(self.methods?.test_method())
+                            if (self.bean) self.bean.show = true
                         }
                     }
                 }

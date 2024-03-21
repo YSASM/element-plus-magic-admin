@@ -31,11 +31,7 @@ export default {
     methods:{
         logout(){
             const store = indexStore()
-            store.$patch({
-                username:"",
-                token:""
-            })
-            location.reload()
+            store.logout()
         }
     }
 }

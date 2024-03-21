@@ -10,8 +10,3 @@ declare module 'monaco-editor' {
         editor
     }
 }
-
-declare module 'vite-plugin-monaco-editor'{
-    import monacoEditorPlugin from 'vite-plugin-monaco-editor'
-    export default monacoEditorPlugin
-}

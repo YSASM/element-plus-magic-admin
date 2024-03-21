@@ -43,7 +43,7 @@ yarn run dev
 ## 如何创建新页面
 
 - 在@/router/routes.js 中声明新的路由
-- 在@/views 下对应的路径下创建 *.tsx
+- 在@/views 下对应的路径下创建 \*.tsx
 - 编写你的第一个网页吧
 
 ```
@@ -70,7 +70,7 @@ export default data
 ```
 
 ## 接口返回数据与数据格式化
- 
+
 接着要创建api接口文件路径为*.tsx在api文件夹下的同名目录
 比如*.tsx的路径为@/views/xxx/yyy.tsx
 api接口文件路径就为@/api/xxx/yyy.ts
@@ -115,6 +115,39 @@ const data:TableData = {
 }
 ```
 
+## 生成环境构建
+
+部署生成环境可以选择nginx等第三方工具，或者本项目提供的在service文件夹下
+以下为配置方法
+代理需要配置service/core/router/proxy.cjs下的内容
+
+```
+/* eslint-disable no-undef */
+const fs = require("fs")
+const logger = require("../utils/log.cjs")
+const isDev = fs.existsSync("service/dev")
+logger.info("DEV:" + isDev)
+module.exports = {
+    '/api': {
+        target: isDev ? 'http://xxx.com' : "http://127.0.0.1:8888",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+    },
+}
+//本地测试可以在service目录下创建一个名为dev的空文件，然后通过const isDev = fs.existsSync("service/dev")就能判断是不是线上环境
+//.gitignore有屏蔽service/dev，所以不会提交
+```
+
+```
+//构建项目
+yarn build
+//启动service服务
+yarn start
+//或
+node --stack-size=12800 --stack-trace-limit=20  ./service/main.cjs
+//没有--stack-trace-limit=20 参数时，日志无法打印出日志发送位置
+```
+
 ## 其他设置
 
 - 在@/config/index.ts 中 baseUrlList 参数可在登录时替换要使用的 baseurl，如不需要留空即可
@@ -123,4 +156,5 @@ const data:TableData = {
 - 更多详细内容请阅读以下相关文档
 
 ## 相关文档
+
 [element-plus](https://element-plus.org/zh-CN/#/zh-CN)

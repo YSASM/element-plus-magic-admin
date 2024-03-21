@@ -88,11 +88,6 @@ export default {
       return obj
     },
     formatJson(obj: any) {
-      // obj = utils.deepClone(obj)
-      let del_list = ["utils", "fieldIndex"]
-      del_list.forEach(item => {
-        delete obj[item]
-      });
       obj = this.themJson(obj)
       let str: any = JSON.stringify(obj)
       str = str.replace(/\\"/g, "\"")

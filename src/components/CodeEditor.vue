@@ -33,7 +33,7 @@ const emits = defineEmits<{
 const sub = () => {
   emits('sub');
 }
-const { monacoEditorRef, createEditor, updateVal, updateOptions, getEditor, formatDoc } = useMonacoEditor(props.language)
+const { monacoEditorRef, createEditor, updateVal, updateOptions, getEditor } = useMonacoEditor(props.language)
 const monacoEditorStyle = computed(() => {
   return {
     width: typeof props.width === 'string' ? props.width : props.width + 'px',
@@ -42,22 +42,34 @@ const monacoEditorStyle = computed(() => {
   }
 })
 
+function updateMonacoVal(val: string) {
+  if (val !== getEditor()?.getValue()) {
+    updateVal(val)
+  }
+}
+
+// function isHTMLSyntaxCorrect(string:st) {
+//   const parser = new DOMParser();
+//   const doc = parser.parseFromString(string, "text/html");
+//   return doc.head.innerHTML + doc.body.innerHTML === string;
+// }
 onMounted(() => {
   const monacoEditor = createEditor(props.editorOption)
   let mv: any = props.modelValue
-  if (typeof mv == "object") {
+  if (props.language == "json" && typeof mv == "object") {
     mv = JSON.stringify(mv)
     emits('change', mv, editorError)
   }
   updateMonacoVal(mv)
-  formatDoc()
   monacoEditor?.onDidChangeModelContent(() => {
     let value = monacoEditor!.getValue()
-    try {
-      JSON.parse(value)
-      editorError.value = false
-    } catch (e) {
-      editorError.value = true
+    if (props.language == "json") {
+      try {
+        JSON.parse(value)
+        editorError.value = false
+      } catch (e) {
+        editorError.value = true
+      }
     }
     emits('change', value, editorError)
   })
@@ -68,18 +80,12 @@ onMounted(() => {
 
 watch(() => props.modelValue, () => {
   let mv: any = props.modelValue
-  if (typeof mv == "object") {
+  if (props.language == "json" && typeof mv == "object") {
     mv = JSON.stringify(mv)
     emits('change', mv, editorError)
   }
   updateMonacoVal(mv)
 })
-
-function updateMonacoVal(val: string) {
-  if (val !== getEditor()?.getValue()) {
-    updateVal(val)
-  }
-}
 
 defineExpose({ updateOptions })
 </script>

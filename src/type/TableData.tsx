@@ -3,7 +3,7 @@ export interface FormData {
     hide?: boolean
     name?: string
     key: string
-    unsub?:boolean
+    unsub?: boolean
     rows?: number
     items?: Array<{
         name: string
@@ -20,14 +20,14 @@ export interface FormData {
     getValue?: (((self: TableData, row: {
         [prop: string]: any
     }) => any))
-    onChange?: (self: TableData,form:Form,formData:FormData,row_id:any)=>void
+    onChange?: (self: TableData, form: Form, formData: FormData, row_id: any) => void
     openValue?: any
     closeValue?: any
     openStr?: string
     closeStr?: string
     disableLabel?: boolean
     [prop: string]: any
-    values?:{
+    values?: {
         [prop: string]: any
     }
     type: "input" | "select" | "cascader" | "datetimerange" | "switch" | "datetime" | "json" | "jsonInput" | "none"
@@ -61,6 +61,7 @@ export interface Form {
 }
 export interface Confirm {
     [prop: string]: any
+    key?: string
     disable?: boolean
     getDisable?: ((self: TableData, row: {
         [prop: string]: any
@@ -89,8 +90,8 @@ export interface Methods {
     getNode?: (item: any) => JSX.Element
     fetchData?: () => void
     getSort?: (sortItem: any) => string
-    getPoint?:(str:string) => JSX.Element
-    getEditor?:(str:string) => JSX.Element
+    getPoint?: (str: string) => JSX.Element
+    getEditor?: (str: string) => JSX.Element
     message?: {
         success: (msg: string) => void
         warning: (msg: string) => void
@@ -103,7 +104,7 @@ export interface Methods {
 }
 
 export interface OnlyFun {
-    key?:string
+    key?: string
     disable?: boolean
     getDisable?: ((self: TableData, row: {
         [prop: string]: any
@@ -112,7 +113,7 @@ export interface OnlyFun {
     type?: "" | "primary" | "success" | "info" | "danger" | "warning" | "text" | ((self: TableData, row: {
         [prop: string]: any
     }) => any)
-    fun:((self: TableData, row: {
+    fun: ((self: TableData, row: {
         [prop: string]: any
     }) => void)
 }
@@ -124,7 +125,7 @@ export interface TableColumn {
     name: string
     buttons?: Array<{
         type: "dialogForm" | "popoverConfirm" | "dialogTable" | "onlyFun"
-        onlyFun?:OnlyFun
+        onlyFun?: OnlyFun
         hide?: boolean
         createTable?: ((self: TableData, row: {
             [prop: string]: any
@@ -153,9 +154,15 @@ export interface TableColumn {
     }
     showJson?: string
     showOverflow?: string
+    unflash?: boolean
     editor?: {
-        type: "json" | "select" | "switch" | "input" | "dialogForm" | "dialogTable" | "onlyFun"
-        onlyFun?:OnlyFun
+        type: "json" | "html" | "select" | "switch" | "input" | "dialogForm" | "dialogTable" | "onlyFun" | "popoverConfirm"
+        onlyFun?: OnlyFun
+        hidePoint?: boolean //只对"dialogTable" | "onlyFun" | "popoverConfirm"生效
+        createConfirm?: ((self: TableData, row: {
+            [prop: string]: any
+        }) => Confirm)
+        confirm?: Confirm
         createForm?: ((self: TableData, row: {
             [prop: string]: any
         }) => Form)
@@ -192,7 +199,10 @@ export interface Fliter {
     key?: string
     startKey?: string
     endKey?: string
-    type?: "input" | "select" | "cascader" | "datetimerange" | "switch" | "dialogForm"
+    type?: "input" | "select" | "cascader" | "datetimerange" | "switch" | "dialogForm" | "dialogTable" | "onlyFun"
+    onlyFun?: OnlyFun
+    createTable?: ((self: TableData) => TableData)
+    tableData?: TableData
     rows?: number
     items?: Array<{
         name: string
@@ -208,6 +218,7 @@ export interface Fliter {
     emptyLabel?: string
     opt?: any
     value?: any
+    getValue?: (self: TableData) => any
     values?: {
         [prop: string]: any
     }
@@ -222,7 +233,7 @@ export interface Fliter {
 
 export interface TableData {
     [prop: string]: any
-    key?:string
+    key?: string
     showText?: string
     show?: boolean
     title?: string
@@ -234,7 +245,7 @@ export interface TableData {
     getDisable?: ((self: TableData, row: {
         [prop: string]: any
     }) => boolean)
-    launchTask?: (Array<(self: TableData) => Promise<any>>) | Array<Array<string>>
+    launchTask?: Array<(self: TableData) => Promise<any>>
     bean?: {
         [prop: string]: any,
     }

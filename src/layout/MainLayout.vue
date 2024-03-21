@@ -5,7 +5,10 @@
       </div>
       <div class="right-content flex-col">
          <TopLayout class="top-bar"></TopLayout>
-         <router-view class="content" v-if="!isReloading" />
+         <transition name="fade" mode="out-in">
+            <router-view class="content" v-if="!isReloading" />
+         </transition>
+
       </div>
    </div>
 </template>
@@ -20,14 +23,10 @@ import { useRouter } from "vue-router"
 export default {
    data() {
       let timer: any = null
-      return {
-         isReloading: false,
-         timer
-      }
-   },
-   setup() {
       const routeNow = utils.getPathName()
       return {
+         isReloading: false,
+         timer,
          routeNow
       }
    },
@@ -45,6 +44,27 @@ export default {
          },
          { immediate: true }
       )
+      console.log(" ......................阿弥陀佛......................\n" +
+         "                       _oo0oo_                      \n" +
+         "                      o8888888o                     \n" +
+         "                      88\" . \"88                     \n" +
+         "                      (| -_- |)                     \n" +
+         "                      0\\  =  /0                     \n" +
+         "                   ___/‘---’\\___                   \n" +
+         "                  .' \\|       |/ '.                 \n" +
+         "                 / \\\\|||  :  |||// \\                \n" +
+         "                / _||||| -卍-|||||_ \\               \n" +
+         "               |   | \\\\\\  -  /// |   |              \n" +
+         "               | \\_|  ''\\---/''  |_/ |              \n" +
+         "               \\  .-\\__  '-'  ___/-. /              \n" +
+         "             ___'. .'  /--.--\\  '. .'___            \n" +
+         "         .\"\" ‘<  ‘.___\\_<|>_/___.’>’ \"\".          \n" +
+         "       | | :  ‘- \\‘.;‘\\ _ /’;.’/ - ’ : | |        \n" +
+         "         \\  \\ ‘_.   \\_ __\\ /__ _/   .-’ /  /        \n" +
+         "    =====‘-.____‘.___ \\_____/___.-’___.-’=====     \n" +
+         "                       ‘=---=’                      \n" +
+         "                                                    \n" +
+         "....................佛祖保佑 ,永无BUG...................")
    },
    methods: {
       reload() {
@@ -81,5 +101,23 @@ export default {
          flex: 1;
       }
    }
+}
+
+.fade-leave,
+// 离开前,进入后透明度是1
+.fade-enter-to {
+   opacity: 1;
+   margin-left: auto;
+}
+
+.fade-leave-active,
+.fade-enter-active {
+   transition: all 0.3s; //过度是2秒
+}
+
+.fade-leave-to,
+.fade-enter {
+   opacity: 0;
+   margin-left: 500px;
 }
 </style>

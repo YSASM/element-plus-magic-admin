@@ -14,10 +14,10 @@ dist
 dist-ssr
 coverage
 *.local
-push.bat
+# push.bat
 /cypress/videos/
 /cypress/screenshots/
-
+/service/dev
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

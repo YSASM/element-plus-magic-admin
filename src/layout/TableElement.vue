@@ -1,5 +1,5 @@
 <template>
-    <el-table size="small" @cell-dblclick="dbClickCell" height="calc(100% - 50px)" :fit="false" lazy
+    <el-table size="small" @cell-dblclick="dbClickCell" height="calc(100% - 50px)" lazy
         :data="data.fetchDataitems" header-cell-class-name="table-head" @sort-change="sortChange"
         :default-sort="data.sortFliter && data.sortFliter.tableDefault || ''" border>
         <ElementRender :vNode="item.node ? item.node : ''" v-for="item, index in data.tableColumns" :key="index">

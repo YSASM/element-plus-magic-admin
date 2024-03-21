@@ -36,6 +36,16 @@ onMounted(() => {
     }
     emits('change', jsonVal, editorError)
 })
+watch(() => props.modelValue, () => {
+    jsonVal.value = checkvalue()
+    try {
+        JSON.parse(jsonVal.value)
+        editorError.value = false
+    } catch (e) {
+        editorError.value = true
+    }
+    emits('change', jsonVal, editorError)
+})
 watch(() => jsonVal.value, () => {
     try {
         JSON.parse(jsonVal.value)
