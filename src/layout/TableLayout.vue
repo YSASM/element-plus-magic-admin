@@ -200,7 +200,6 @@ export default {
         if (item.value === undefined && item.getValue) {
           item.value = item.getValue(this.data)
         }
-        console.log(item.value)
         if (item.value === undefined) {
           item.value = ""
         }
