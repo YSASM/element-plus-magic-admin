@@ -2,6 +2,8 @@
 <div align="center">v0.2.0</div>
 <div align="center">
   <img src="https://avatars.githubusercontent.com/u/80308986?v=4" style="width:100px;height:100px;"/>
+  <span>联系QQ:1613921123</span>
+  <span>欢迎大佬批评指正</span>
 </div>
 
 <div align="center">
