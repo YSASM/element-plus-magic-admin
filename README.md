@@ -3,6 +3,8 @@
 <div align="center">
   <img src="https://avatars.githubusercontent.com/u/80308986?v=4" style="width:100px;height:100px;"/>
 </div>
+<div align="center">联系QQ:1613921123</div>
+<div align="center">欢迎大佬批评指正</div>
 
 <div align="center">
 
@@ -115,7 +117,7 @@ const data:TableData = {
 }
 ```
 
-## 生成环境构建
+## 生产环境构建
 
 部署生成环境可以选择nginx等第三方工具，或者本项目提供的在service文件夹下
 以下为配置方法
