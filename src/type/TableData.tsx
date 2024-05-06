@@ -30,7 +30,11 @@ export interface FormData {
     values?: {
         [prop: string]: any
     }
-    type: "input" | "select" | "cascader" | "datetimerange" | "switch" | "datetime" | "json" | "jsonInput" | "none"
+    tagEditor?: boolean
+    tagEditorInput?: String
+    type: "input" | "select" | "cascader" | "datetimerange" | "switch" | "datetime" | "json" | "jsonInput" | "tagGroup" | "none"
+    multiple?: boolean
+    filterable?: boolean
     disable?: boolean
     getDisable?: ((self: TableData, data: {
         [prop: string]: any

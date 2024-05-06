@@ -10,6 +10,9 @@
         <el-form-item class="fliter-item">
           <el-button type="primary" @click="fetchData">查询</el-button>
         </el-form-item>
+        <el-form-item class="fliter-item">
+          <el-button type="success" @click="resetFliter">重置筛选</el-button>
+        </el-form-item>
       </el-form>
     </div>
     <div class="content-box flex-col" v-loading="!data.ready" element-loading-text="Loading...">
@@ -49,6 +52,8 @@ export default {
     var data: TableData = {}
     return {
       data,
+      fliterDefault: null,
+      fliterHistory: null,
       loding: true
     };
   },
@@ -550,7 +555,9 @@ export default {
             }
           }}
         >
-          <el-form label-width="auto" size="small">
+          <el-form onSubmit={(event: any) => {
+            event.preventDefault()
+          }} label-width="auto" size="small">
             {
               form.data?.map((item, i) => {
                 if (item.hide) {
@@ -649,7 +656,7 @@ export default {
               item.emptyLabel = item.items[0].name
             }
           }
-          return (<el-select disabled={item.disable} modelValue={item.values[row.id]} placeholder={item.emptyLabel} filterable={item.filterable}
+          return (<el-select disabled={item.disable} modelValue={item.values[row.id]} placeholder={item.emptyLabel} filterable={item.filterable} multiple={item.multiple}
             onChange={(e: any) => {
               if (item.values) {
                 item.values[row.id] = e
@@ -792,6 +799,83 @@ export default {
               }
             }}
           ></JsonInputVue>)
+        }
+        case "tagGroup": {
+          if (item.tagEditor === undefined) {
+            item.tagEditor = false
+          }
+          if (item.tagEditorInput === undefined) {
+            item.tagEditorInput = ""
+          }
+          return (<div style="gap: 5px; flex-wrap: wrap; display: flex;border: 1px solid #b7b7b7;width: 100%;padding: 5px;border-radius: 5px;">
+            {
+              item.values[row.id].split(",").map((tag: any, index: any) => {
+                tag = tag.replace(/ /g, "")
+                if (tag !== "") {
+                  return (<el-tag
+                    key={tag}
+                    closable
+                    disable-transitions={false}
+                    onClose={() => {
+                      if (item.values) {
+                        const temp = item.values[row.id].split(",")
+                        temp.splice(index, 1)
+                        item.values[row.id] = temp.filter((i: any) => i !== "").join(",")
+                      }
+                    }}
+                  >
+                    {tag}
+                  </el-tag>)
+                }
+                return ""
+              })
+            }
+            {
+              item.tagEditor ? <el-input
+                vModel_trim={item.tagEditorInput}
+                style="width:100px;"
+                ref={(el: any) => {
+                  if (el) {
+                    el.focus()
+                  }
+                }}
+                size="small"
+                onBlur={() => {
+                  if (item.values && item.tagEditorInput !== "") {
+                    const temp = item.values[row.id].split(",")
+                    temp.push(item.tagEditorInput)
+                    item.values[row.id] = temp.filter((i: any) => i !== "").join(",")
+                  }
+                  item.tagEditorInput = ""
+                  item.tagEditor = false
+                }}
+                onKeyup={(e: any) => {
+                  if (e.key == "Enter") {
+                    if (item.values && item.tagEditorInput !== "") {
+                      const temp = item.values[row.id].split(",")
+                      temp.push(item.tagEditorInput)
+                      item.values[row.id] = temp.filter((i: any) => i !== "").join(",")
+                    }
+                    item.tagEditorInput = ""
+                    item.tagEditor = false
+                  }
+                  else if (e.key == "Control") {
+                    if (item.values && item.tagEditorInput !== "") {
+                      const temp = item.values[row.id].split(",")
+                      temp.push(item.tagEditorInput)
+                      item.values[row.id] = temp.filter((i: any) => i !== "").join(",")
+                    }
+                    item.tagEditorInput = ""
+                  }
+                }}
+              /> :
+                <el-button size="small" onClick={() => {
+                  item.tagEditor = true
+                }}>
+                  + New Tag
+                </el-button>
+            }
+          </div>)
         }
       }
       return (<div></div>)
@@ -1053,13 +1137,14 @@ export default {
               }
               if (value == "") { value = "" }
               value = JSON.stringify(value)
+              const origin_element = element
               element = (
                 <el-popover
                   placement="right"
                   width="400"
                   trigger="click"
                   v-slots={{
-                    reference: () => this.getPoint(props.row[item.key] || ""),
+                    reference: () => item.showTag ? origin_element : this.getPoint(props.row[item.key] || ""),
                     default: () => <JsonViewer
                       value={value}
                     ></JsonViewer>
@@ -1197,10 +1282,14 @@ export default {
                 }
               }
               else if (item.editor.type == "dialogTable") {
+
                 if (item.editor.createTable) {
                   item.editor.tableData = item.editor.createTable(this.data, props.row)
                 }
                 if (item.editor.tableData) {
+                  if (this.tableDataPath) {
+                    item.editor.tableData.disable = true
+                  }
                   element = this.createTable(item.editor.tableData, props.row, true)
                   if (!item.editor.hidePoint) {
                     element = this.getPoint(element)
@@ -1262,6 +1351,20 @@ export default {
     getEditor(content: any) {
       return (<div class="can-point flex-row"><el-icon style="align-self: center;"><Edit /></el-icon>{content}</div>)
     },
+    resetFliter() {
+      this.data.fliter?.forEach((item: any) => {
+        if (item.type == "datetimerange" && item.startKey && item.endKey && this.fliterDefault) {
+          item.value = [
+            this.fliterDefault[item.startKey] !== "" ? this.fliterDefault[item.startKey] * 1000 : null,
+            this.fliterDefault[item.endKey] !== "" ? this.fliterDefault[item.endKey] * 1000 : null
+          ]
+        }
+        else if (item.key && this.fliterDefault) {
+          item.value = this.fliterDefault[item.key]
+        }
+      })
+      this.fetchData()
+    },
     fetchData() {
       this.data.ready = false
       this.$forceUpdate()
@@ -1281,6 +1384,22 @@ export default {
         this.data.ready = true
         return
       }
+      if (this.fliterDefault === null) {
+        this.fliterDefault = fliter
+      }
+      if (this.fliterHistory !== null) {
+        for (let key in fliter) {
+          if (key === "page" || key === "size" || key === "sort") {
+            continue
+          }
+          if (this.fliterHistory[key] !== fliter[key] && this.fliterDefault) {
+            this.data.pageFliter.value = this.fliterDefault["page"]
+            fliter["page"] = this.fliterDefault["page"]
+            break
+          }
+        }
+      }
+      this.fliterHistory = fliter
       this.data.fetchFun(this.data, fliter).then((res: any) => {
         this.data.fetchDataitems = res.data.items
         this.data.total = res.data.total
