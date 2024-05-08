@@ -50,6 +50,9 @@ const data: TableData = {
             }
         },
         {
+            key: "id", name: "id", showPre:"id"
+        },
+        {
             key: "table_tools", name: "操作", buttons: [
                 {
                     type: "dialogTable",

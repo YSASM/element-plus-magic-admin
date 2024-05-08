@@ -158,6 +158,7 @@ export interface TableColumn {
     }
     showJson?: string
     showOverflow?: string
+    showPre?: string
     unflash?: boolean
     editor?: {
         type: "json" | "html" | "select" | "switch" | "input" | "dialogForm" | "dialogTable" | "onlyFun" | "popoverConfirm"

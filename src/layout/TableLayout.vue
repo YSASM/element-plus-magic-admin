@@ -1074,7 +1074,7 @@ export default {
       }
       let index = 0
       return (<el-table-column fixed={item.fixed}
-        show-overflow-tooltip={!item.buttons && !item.showJson && !item.editor}
+        show-overflow-tooltip={!item.buttons && !item.showJson && !item.editor && !item.showPre}
         width={item.width}
         align="center"
         column-key={item.key}
@@ -1152,6 +1152,28 @@ export default {
                 >
                 </el-popover>)
             }
+
+            if (item.showPre && !item.editor) {
+              let value = props.row[item.showPre]
+              if (!value) { value = "" }
+              const origin_element = element
+              element = (
+                <el-popover
+                  placement="top"
+                  width="400"
+                  trigger="click"
+                  v-slots={{
+                    reference: () => item.showTag ? origin_element : this.getPoint(props.row[item.key] || ""),
+                    default: () => <div>{
+                      value.split("\n").map((item: string) => {
+                        return <div>{item}</div>
+                      })
+                    }</div>
+                  }}
+                >
+                </el-popover>)
+            }
+
             if (item.showOverflow && !item.editor) {
               if (props.row[item.showOverflow]) {
                 element = (<el-tooltip
