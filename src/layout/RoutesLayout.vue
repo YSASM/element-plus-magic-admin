@@ -1,7 +1,8 @@
 <template>
     <div class="routes-layout">
         <div class="title" @click="goUrl('/')">{{ title }}</div>
-        <RoutesListLayout :routes="routes" @go-url="goUrl" @show-children="showMoreRotes" :route-now="routeNow">
+        <RoutesListLayout class="routes-list" :routes="routes" @go-url="goUrl" @show-children="showMoreRotes"
+            :route-now="routeNow">
         </RoutesListLayout>
     </div>
 </template>
@@ -80,9 +81,15 @@ export default {
     .title {
         font-size: 24px;
         max-width: 140px;
-        margin: 30px auto 30px auto;
+        margin: 30px;
+        height: 30px;
         color: #fff;
         text-align: center;
+    }
+
+    .routes-list {
+        height: calc(100vh - 90px);
+        overflow-y: auto;
     }
 
 
