@@ -1,6 +1,6 @@
 <template>
   <div v-if="!loding" class="page">
-    <div v-loading="!data.ready" class="fliter-box flex-row">
+    <div v-loading="!data.ready" v-if="data.fliter !== undefined" class="fliter-box flex-row">
       <!-- eslint-disable-next-line vue/no-deprecated-v-on-native-modifier -->
       <el-form @submit.native.prevent :inline="true" size="small" label-width="auto" style="margin-top: auto;">
         <el-form-item v-show="item.type && !item.hide" v-for="item, index in data.fliter" :key="'fliter_' + index"

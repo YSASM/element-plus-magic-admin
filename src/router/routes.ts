@@ -57,6 +57,14 @@ const routes: Array<RouteRecordRaw> = [
           icon: 'Promotion',
         },
       },
+      {
+        path: 'test4',
+        component: TableLayout,
+        meta: {
+          title: '测试4',
+          icon: 'Promotion',
+        },
+      },
     ]
   },
 ]
