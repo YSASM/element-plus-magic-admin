@@ -33,13 +33,21 @@ vue2.x 请移步[https://github.com/YSASM/MagicTable](https://github.com/YSASM/M
 ## 如何开始
 
 ```
-git clone https://github.com/YSASM/MagicTableV2.git
+git clone https://github.com/YSASM/element-plus-magic-admin.git
 
-cd MagicTableV2
+cd element-plus-magic-admin
+
+# 建议node版本18
+# yarn
 
 yarn
 
 yarn run dev
+# npm
+
+npm install
+
+nom run dev
 ```
 
 ## 如何创建新页面
