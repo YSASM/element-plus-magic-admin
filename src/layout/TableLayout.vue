@@ -1,6 +1,6 @@
 <template>
   <div v-if="!loding" class="page">
-    <div v-loading="!data.ready" v-if="data.fliter !== undefined" class="fliter-box flex-row">
+    <div v-loading="!data.ready" v-if="data.showFliter" class="fliter-box flex-row">
       <!-- eslint-disable-next-line vue/no-deprecated-v-on-native-modifier -->
       <el-form @submit.native.prevent :inline="true" size="small" label-width="auto" style="margin-top: auto;">
         <el-form-item v-show="item.type && !item.hide" v-for="item, index in data.fliter" :key="'fliter_' + index"
@@ -45,6 +45,9 @@ export default {
       type: String
     },
     reWriteTableData: {
+      type: Object
+    },
+    tableRow: {
       type: Object
     }
   },
@@ -120,11 +123,23 @@ export default {
       this.data.methods.message = message
       this.data.methods.utils = utils
 
-      this.formatData()
+      if (this.tableRow) {
+        this.data.row = this.tableRow
+      }
+      if (!this.data.launchTask) {
+        this.data.launchTask = []
+      }
+      if (this.reWriteTableData) {
+        this.renderRewriteTableData()
+      }
 
+
+      this.formatData()
       for (let i in this.data.launchTask) {
         const task: any = this.data.launchTask[Number(i)]
-        await task(this.data)
+        if (typeof task === "function") {
+          await task(this.data)
+        }
       }
       if (!this.tableDataPath) {
         document.onkeyup = (e) => {
@@ -133,7 +148,6 @@ export default {
           }
         }
       }
-      this.renderRewriteTableData()
       this.loding = false
     } catch (e: any) {
       this.loding = false
@@ -151,30 +165,37 @@ export default {
     this.data = {}
   },
   methods: {
-    renderRewriteTableData(reWriteTableData: any = null) {
-      if (!reWriteTableData) {
-        reWriteTableData = this.reWriteTableData
-      }
-      if (!reWriteTableData) {
-        return
-      }
-      this.renderRewriteFliter(reWriteTableData.fliter)
+    renderRewriteTableData() {
+      this.data.fliter = this.renderRewriteArray((this.reWriteTableData as any).fliter, this.data.fliter)
+      this.data.tableColumns = this.renderRewriteArray((this.reWriteTableData as any).tableColumns, this.data.tableColumns)
+      this.renderRewriteOther(this.reWriteTableData)
     },
-    renderRewriteFliter(fliter: any) {
-      if (fliter) {
-        for (let i in fliter) {
-          this.upDataFliter(fliter[i])
+    renderRewriteOther(reWriteTableData: any = null) {
+      if (reWriteTableData.fetchFun) {
+        this.data.fetchFun = reWriteTableData.fetchFun
+      }
+      if (reWriteTableData.launchTask) {
+        this.data.launchTask = [...this.data.launchTask as any, ...reWriteTableData.launchTask]
+      }
+      if (reWriteTableData.addNods) {
+        this.data.addNods = [...this.data.addNods as any, ...reWriteTableData.addNods]
+      }
+      this.data.ignoreTableDialogButtonsDisable = reWriteTableData.ignoreTableDialogButtonsDisable
+    },
+    renderRewriteArray(renderData: any, data: any) {
+      if (renderData) {
+        if (renderData.length === 0) {
+          return []
         }
-      }
-    },
-    upDataFliter(item: any) {
-      for (let i in this.data.fliter) {
-        if (this.data.fliter[Number(i)].key == item.key) {
-          for (let j in item) {
-            this.data.fliter[Number(i)][j] = item[j]
+        for (let i in renderData) {
+          for (let j in data) {
+            if (data[j].key == renderData[i].key) {
+              data[j] = { ...data[j], ...renderData[i] }
+            }
           }
         }
       }
+      return data
     },
     getCircularReplacer() {
       const seen = new WeakSet();
@@ -197,6 +218,9 @@ export default {
     formatData(data: any = null) {
       if (!data) {
         data = this.data
+      }
+      if (!data.fliter) {
+        data.filter = []
       }
       data.fliter?.forEach((item: any) => {
         if (item.items && item.items.length > 0 && item.items[0].key == "") {
@@ -257,7 +281,11 @@ export default {
         }
         this.addFliter(data.sortFliter)
       }
-
+      this.data.showFliter = this.data.fliter ? this.data.fliter?.map(i => {
+        return i.key
+      }).filter((i: any) => {
+        return !['page', 'size', 'sort'].includes(i, undefined)
+      }).length > 0 : true
     },
     getSort(sortItem: any) {
       if (!sortItem.key || !sortItem.sort) {
@@ -328,7 +356,7 @@ export default {
     getFliterNode(item: Fliter) {
       switch (item.type) {
         case "input": {
-          return (<el-input vModel_trim={item.value} clearable={true} onKeyup={(e: any) => {
+          return (<el-input vModel={item.value} clearable={true} onKeyup={(e: any) => {
             if (e.key == "Enter") {
               this.fetchData()
             }
@@ -374,7 +402,7 @@ export default {
           </el-cascader>)
         }
         case "datetimerange": {
-          return (<el-date-picker vModel_trim={item.value} type="datetimerange" value-format="x"
+          return (<el-date-picker vModel={item.value} type="datetimerange" value-format="x"
             range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" picker-options={item.opt ? item.opt : {
               shortcuts: [{
                 text: '最近一周',
@@ -645,7 +673,7 @@ export default {
           return null
         }
         case "input": {
-          return (<el-input disabled={item.disable} vModel_trim={item.values[row.id]} clearable={true}
+          return (<el-input disabled={item.disable} vModel={item.values[row.id]} clearable={true}
             type={item.rows ? 'textarea' : ''} rows={item.rows ? item.rows : null} placeholder={item.emptyLabel}
           ></el-input>)
         }
@@ -696,7 +724,7 @@ export default {
           </el-cascader>)
         }
         case "datetimerange": {
-          return (<el-date-picker vModel_trim={item.values[row.id]} type="datetimerange" value-format="x"
+          return (<el-date-picker vModel={item.values[row.id]} type="datetimerange" value-format="x"
             disabled={item.disable}
             range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" picker-options={item.opt ? item.opt : {
               shortcuts: [{
@@ -728,7 +756,7 @@ export default {
           </el-date-picker>)
         }
         case "datetime": {
-          return (<el-date-picker disabled={item.disable} vModel_trim={item.values[row.id]} type="datetime" value-format="x" style="width:100%"
+          return (<el-date-picker disabled={item.disable} vModel={item.values[row.id]} type="datetime" value-format="x" style="width:100%"
             placeholder="选择日期">
           </el-date-picker>)
         }
@@ -832,7 +860,7 @@ export default {
             }
             {
               item.tagEditor ? <el-input
-                vModel_trim={item.tagEditorInput}
+                vModel={item.tagEditorInput}
                 style="width:100px;"
                 ref={(el: any) => {
                   if (el) {
@@ -914,7 +942,7 @@ export default {
             button.tableData = button.createTable(this.data, row)
           }
           if (button.tableData) {
-            if (this.tableDataPath) {
+            if (this.tableDataPath && !this.data.ignoreTableDialogButtonsDisable) {
               button.tableData.disable = true
             }
             else {
@@ -963,13 +991,6 @@ export default {
       let renderRow: any = null
       if (tableData.renderRow) {
         renderRow = utils.deepClone(tableData.renderRow)
-        renderRow.fliter?.forEach((item: any) => {
-          if (typeof item.value == "object") {
-            if (row[item.value.row]) {
-              item.value = row[item.value.row]
-            }
-          }
-        })
       }
       return (<div>
         <el-dialog
@@ -985,7 +1006,7 @@ export default {
           }}
           width="1800"
           v-slots={{
-            default: () => { return tableData.show == row.id ? <TableLayout reWriteTableData={renderRow} tableDataPath={tableData.path}></TableLayout> : "" }
+            default: () => { return tableData.show == row.id ? <TableLayout reWriteTableData={renderRow} tableRow={row} tableDataPath={tableData.path}></TableLayout> : "" }
           }}
         ></el-dialog>
         <el-button size="small" disabled={disable} type={buttonType} onClick={() => {
@@ -1111,6 +1132,9 @@ export default {
                   type: "info",
                   content: "***"
                 }
+                if (item.showTag["*"]) {
+                  tag = item.showTag["*"]
+                }
               }
               let value = ""
               if (tag.content == "***") {
@@ -1200,7 +1224,7 @@ export default {
                     item.editor.editoring === props.row.id ?
                       <el-input
                         ref={(el: any) => editorRef = el}
-                        vModel_trim={props.row[item.key]}
+                        vModel={props.row[item.key]}
                         onMouseenter={() => {
                           if (editorRef) {
                             editorRef.focus()
@@ -1309,7 +1333,7 @@ export default {
                   item.editor.tableData = item.editor.createTable(this.data, props.row)
                 }
                 if (item.editor.tableData) {
-                  if (this.tableDataPath) {
+                  if (this.tableDataPath && !this.data.ignoreTableDialogButtonsDisable) {
                     item.editor.tableData.disable = true
                   }
                   element = this.createTable(item.editor.tableData, props.row, true)
@@ -1424,6 +1448,7 @@ export default {
       this.fliterHistory = fliter
       this.data.fetchFun(this.data, fliter).then((res: any) => {
         this.data.fetchDataitems = res.data.items
+        this.data.fetchDatasummary = res.data.summary
         this.data.total = res.data.total
         this.data.ready = true
         this.$forceUpdate()

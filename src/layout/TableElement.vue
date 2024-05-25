@@ -1,15 +1,16 @@
 <template>
     <el-table size="small" @cell-dblclick="dbClickCell" height="calc(100% - 50px)" lazy
-        :data="data.fetchDataitems" header-cell-class-name="table-head" @sort-change="sortChange"
+        :show-summary="data.fetchDatasummary" :summary-method="summaryMethod" :data="data.fetchDataitems"
+        header-cell-class-name="table-head" @sort-change="sortChange"
         :default-sort="data.sortFliter && data.sortFliter.tableDefault || ''" border>
         <ElementRender :vNode="item.node ? item.node : ''" v-for="item, index in data.tableColumns" :key="index">
         </ElementRender>
     </el-table>
     <div class="flex-row">
         <el-pagination v-if="data.pageFliter && data.sizeFliter" :total="data.total"
-        v-model:current-page="data.pageFliter.value" v-model:page-size="data.sizeFliter.value" :page-sizes="data.sizeOption"
-        :disabled="false" :background="true" layout="total, sizes, prev, pager, next, jumper" @size-change="fetchData"
-        @current-change="fetchData" />
+            v-model:current-page="data.pageFliter.value" v-model:page-size="data.sizeFliter.value"
+            :page-sizes="data.sizeOption" :disabled="false" :background="true"
+            layout="total, sizes, prev, pager, next, jumper" @size-change="fetchData" @current-change="fetchData" />
         <div class="el-pagination tip-text">{{ data.showText }}</div>
     </div>
 </template>
@@ -34,9 +35,22 @@ const fetchData = () => {
     data.methods?.fetchData && data.methods?.fetchData()
 }
 const dbClickCell = (row: any, column: any) => {
-    let text = row[column.columnKey]||""
+    let text = row[column.columnKey] || ""
     clipboard.copy(text)
-    message.success("复制成功:"+text)
+    message.success("复制成功:" + text)
+}
+
+const summaryMethod = () => {
+    if (typeof data.fetchDatasummary === "object") {
+        if (!Array.isArray(data.fetchDatasummary)) {
+            const temp = []
+            for (let k in data.fetchDatasummary) {
+                temp.push(data.fetchDatasummary[k])
+            }
+            data.fetchDatasummary = temp
+        }
+    }
+    return data.fetchDatasummary
 }
 const sortChange = (sort: any) => {
     if (!sort.order && data.sortFliter && data.sortFliter.tableDefault.order == "ascending") {
@@ -61,7 +75,7 @@ const sortChange = (sort: any) => {
 </script>
 
 <style lang="scss">
-.tip-text{
+.tip-text {
     margin-left: auto;
     margin-right: 20px;
     color: red;

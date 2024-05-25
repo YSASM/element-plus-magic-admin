@@ -205,6 +205,7 @@ export interface Fliter {
     startKey?: string
     endKey?: string
     type?: "input" | "select" | "cascader" | "datetimerange" | "switch" | "dialogForm" | "dialogTable" | "onlyFun"
+    filterable?: boolean
     onlyFun?: OnlyFun
     createTable?: ((self: TableData) => TableData)
     tableData?: TableData
@@ -239,6 +240,7 @@ export interface Fliter {
 export interface TableData {
     [prop: string]: any
     key?: string
+    // 表格右下角显示文字
     showText?: string
     show?: boolean
     title?: string
@@ -276,6 +278,7 @@ export interface TableData {
     //     key: string
     //     value: string
     // }
+    // 不用any elementui会报错
     pageFliter?: any
     sizeFliter?: any
     sortFliter?: any
@@ -285,7 +288,10 @@ export interface TableData {
     beforeFetch?: ((self: TableData, fliter: { [prop: string]: any }) => void)
     fetchFun?: ((self: TableData, data: { [prop: string]: any }) => Promise<any>)
     fetchDataitems?: any
+    fetchDatasummary?: any
     tableColumns?: Array<TableColumn> | null
     addNods?: Array<(self: TableData) => JSX.Element>
     renderRow?: TableData
+    // 使链接的表格中表格按钮可用，写在renderRow中
+    ignoreTableDialogButtonsDisable?: Boolean
 }

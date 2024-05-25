@@ -1,0 +1,40 @@
+.routes-list {
+    user-select: none;
+    list-style-type: none;
+    padding: 0 5px 0 5px;
+
+    .child-icon {
+        margin: auto;
+        margin-right: 20px;
+        transition: transform .3s;
+        
+    }
+    .child-icon-show{
+        transform: rotate(180deg);
+    }
+    .icon {
+        margin: auto 5px auto 20px;
+    }
+
+    .item {
+        height: 50px;
+        line-height: 50px;
+        vertical-align: middle;
+        color: rgba(255, 255, 255, 0.95);
+        border-radius: 5px;
+        margin: 7px auto 7px 0;
+        font-size: 14px;
+        transition: background-color .3s;
+    }
+    .item:hover {
+        background-color: #409eff;
+    }
+
+    .checked {
+        background-color: #409eff;
+    }
+
+    .child:hover{
+        background-color: rgb(27, 28, 31);
+    }
+}

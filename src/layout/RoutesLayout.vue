@@ -10,7 +10,7 @@
 
 import { useRouter } from 'vue-router';
 import { indexStore } from "@/stores"
-import RoutesListLayout from './RoutesListLayout.vue';
+import RoutesListLayout from './RoutesListLayout';
 import { reactive } from 'vue';
 export default {
     props: {
@@ -74,7 +74,7 @@ export default {
     width: 200px;
     height: 100vh;
     overflow: hidden;
-    background: #21252b;
+    background: #383f49;
     box-shadow: 2px 0 6px rgba(0, 21, 41, .35);
     transition: width .3s;
 
@@ -91,7 +91,5 @@ export default {
         height: calc(100vh - 90px);
         overflow-y: auto;
     }
-
-
 }
 </style>
