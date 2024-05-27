@@ -191,11 +191,12 @@ export default {
           for (let j in data) {
             if (data[j].key == renderData[i].key) {
               data[j] = { ...data[j], ...renderData[i] }
+              renderData[i] = data[j]
             }
           }
         }
       }
-      return data
+      return [...(renderData || []), ...data]
     },
     getCircularReplacer() {
       const seen = new WeakSet();

@@ -56,9 +56,9 @@ const data: TableData = {
         {
             key: "time", name: "时间", editor: {
                 type: "onlyFun",
-                hidePoint: true,
+                // hidePoint: true,
                 onlyFun: {
-                    type: "info",
+                    type: "text",
                     key: "time",
                     fun: (_, row) => {
                         alert(row.time)

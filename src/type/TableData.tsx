@@ -294,4 +294,5 @@ export interface TableData {
     renderRow?: TableData
     // 使链接的表格中表格按钮可用，写在renderRow中
     ignoreTableDialogButtonsDisable?: Boolean
+    row?:any
 }

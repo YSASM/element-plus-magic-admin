@@ -6,9 +6,9 @@ const data: TableData = {
     },
     fliter: [
         {
-            type:"input",
-            key:"t",
-            name:"测试"
+            type: "input",
+            key: "t",
+            name: "测试"
         }
     ],
     tableColumns: [
@@ -24,9 +24,9 @@ const data: TableData = {
                         fliter: [
                             {
                                 key: "id",
-                                value: {
-                                    row: "id"
-                                }
+                                getValue(self) {
+                                    return self.row.id
+                                },
                             },
                             {
                                 key: "test_input",
@@ -42,7 +42,7 @@ const data: TableData = {
                             },
                             {
                                 key: "time",
-                                value: [1709615081000,1709615090000]
+                                value: [1709615081000, 1709615090000]
                             },
                         ]
                     }
@@ -50,7 +50,7 @@ const data: TableData = {
             }
         },
         {
-            key: "id", name: "id", showPre:"id"
+            key: "id", name: "id", showPre: "id"
         },
         {
             key: "table_tools", name: "操作", buttons: [
@@ -65,9 +65,12 @@ const data: TableData = {
                             fliter: [
                                 {
                                     key: "id",
-                                    value: {
-                                        row: "id"
-                                    }
+                                    name: "ID",
+                                    emptyLabel: "id",
+                                    type: "input",
+                                    getValue(self) {
+                                        return self.row.id
+                                    },
                                 },
                                 {
                                     key: "test_input",
